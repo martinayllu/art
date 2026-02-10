@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series | Your Name</title>
+    
+    <style>
+        /* ========================================
+           GLOBAL STYLES
+        ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        /* ========================================
+           NAVIGATION - Same as other pages
+        ======================================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            padding: 25px 0;
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+        
+        .logo:hover {
+            opacity: 0.7;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        nav ul li a.active {
+            color: #cccccc;
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #ffffff;
+            transition: width 0.3s ease;
+        }
+        
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+        }
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+        }
+        
+        .menu-toggle span {
+            width: 28px;
+            height: 2px;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        /* ========================================
+           SERIES PAGE HEADER
+        ======================================== */
+        .series-header {
+            margin-top: 120px;
+            padding: 80px 40px 60px;
+            text-align: center;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .series-header h1 {
+            font-size: 56px;
+            font-weight: 200;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+        }
+        
+        .series-header p {
+            font-size: 16px;
+            color: #999;
+            letter-spacing: 2px;
+            line-height: 1.8;
+        }
+        
+        /* ========================================
+           SERIES GRID
+           Grid of photography series/collections
+        ======================================== */
+        .series-grid {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 60px;
+        }
+        
+        /* Individual series card */
+        .series-card {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .series-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Series cover image container */
+        .series-image {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            background-color: #111;
+            border: 1px solid #1a1a1a;
+            margin-bottom: 25px;
+        }
+        
+        /* Series cover images */
+        /* UPDATE: Replace "series-1.jpg" through "series-4.jpg" with your series cover images */
+        .series-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease, opacity 0.3s ease;
+            opacity: 0.85;
+        }
+        
+        .series-card:hover .series-image img {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        
+        /* Dark overlay on hover */
+        .series-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .series-card:hover .series-image::after {
+            opacity: 1;
+        }
+        
+        /* Series information */
+        .series-info h2 {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .series-meta {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        /* Series description */
+        /* UPDATE: Add descriptions for each series in HTML below */
+        .series-info p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #999;
+            font-weight: 300;
+        }
+        
+        /* ========================================
+           FOOTER
+        ======================================== */
+        footer {
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 1px solid #222;
+            margin-top: 100px;
+        }
+        
+        footer p {
+            font-size: 11px;
+            color: #666666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        /* ========================================
+           RESPONSIVE - TABLET
+        ======================================== */
+        @media (max-width: 1024px) {
+            .series-grid {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+        }
+        
+        /* ========================================
+           RESPONSIVE - MOBILE
+        ======================================== */
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 0;
+            }
+            
+            nav .container {
+                padding: 0 20px;
+            }
+            
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.98);
+                padding: 100px 40px;
+                gap: 30px;
+                justify-content: flex-start;
+            }
+            
+            nav ul.active {
+                display: flex;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .series-header {
+                margin-top: 80px;
+                padding: 50px 20px 40px;
+            }
+            
+            .series-header h1 {
+                font-size: 32px;
+                letter-spacing: 2px;
+            }
+            
+            .series-grid {
+                padding: 0 20px;
+                gap: 40px;
+            }
+            
+            .series-info h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ========================================
+         NAVIGATION
+    ======================================== -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">YOUR NAME</a>
+            
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul id="menu">
+                <li><a href="about.html">About</a></li>
+                <li><a href="series.html" class="active">Series</a></li>
+                <li><a href="projects.html">Featured Projects</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- ========================================
+         SERIES PAGE HEADER
+    ======================================== -->
+    <section class="series-header">
+        <h1>Series</h1>
+        <p>
+            Ongoing and completed photographic series exploring themes of urban life, 
+            light, shadow, and human connection through a minimalist lens.
+        </p>
+    </section>
+    
+    <!-- ========================================
+         SERIES GRID
+         Photography series/collections
+    ======================================== -->
+    <section class="series-grid">
+        
+        <!-- ========================================
+             SERIES 1
+             UPDATE: Replace "series-1.jpg" with your series cover image
+        ======================================== -->
+        <div class="series-card">
+            <div class="series-image">
+                <img src="series-1.jpg" alt="Metropolis Series">
+            </div>
+            <div class="series-info">
+                <!-- UPDATE: Change series title -->
+                <h2>Metropolis</h2>
+                <!-- UPDATE: Change year and number of images -->
+                <p class="series-meta">2024 | 45 Images</p>
+                <!-- UPDATE: Change series description -->
+                <p>
+                    An exploration of urban architecture and the interplay between 
+                    geometric forms and natural light. This series captures the essence 
+                    of modern city life through stark contrasts and minimalist compositions.
+                </p>
+            </div>
+        </div>
+        
+        <!-- ========================================
+             SERIES 2
+             UPDATE: Replace "series-2.jpg" with your series cover image
+        ======================================== -->
+        <div class="series-card">
+            <div class="series-image">
+                <img src="series-2.jpg" alt="Shadows Series">
+            </div>
+            <div class="series-info">
+                <h2>Shadows</h2>
+                <p class="series-meta">2023 | 32 Images</p>
+                <p>
+                    A study in contrast and negative space. This series examines how shadows 
+                    create their own narratives, transforming ordinary scenes into abstract 
+                    compositions of light and dark.
+                </p>
+            </div>
+        </div>
+        
+        <!-- ========================================
+             SERIES 3
+             UPDATE: Replace "series-3.jpg" with your series cover image
+        ======================================== -->
+        <div class="series-card">
+            <div class="series-image">
+                <img src="series-3.jpg" alt="Solitude Series">
+            </div>
+            <div class="series-info">
+                <h2>Solitude</h2>
+                <p class="series-meta">2023 | 28 Images</p>
+                <p>
+                    Capturing moments of isolation within crowded urban environments. 
+                    This series focuses on the individual experience of being alone in 
+                    the midst of millions.
+                </p>
+            </div>
+        </div>
+        
+        <!-- ========================================
+             SERIES 4
+             UPDATE: Replace "series-4.jpg" with your series cover image
+        ======================================== -->
+        <div class="series-card">
+            <div class="series-image">
+                <img src="series-4.jpg" alt="Nocturne Series">
+            </div>
+            <div class="series-info">
+                <h2>Nocturne</h2>
+                <p class="series-meta">2022-2024 | 52 Images | Ongoing</p>
+                <p>
+                    An ongoing documentation of the city after dark. Nocturne explores 
+                    the transformation of familiar spaces under artificial light, revealing 
+                    a different character of urban life.
+                </p>
+            </div>
+        </div>
+        
+        <!-- ========================================
+             TO ADD MORE SERIES:
+             Copy one of the series-card blocks above and paste here.
+             Update the image filename, title, year, count, and description.
+        ======================================== -->
+        
+    </section>
+    
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+    <footer>
+        <p>© YOUR NAME - DESIGNED BY YOU</p>
+    </footer>
+    
+    <!-- ========================================
+         JAVASCRIPT
+    ======================================== -->
+    <script>
+        // Toggle mobile menu
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('active');
+        }
+        
+        // Close menu when clicking links
+        document.querySelectorAll('#menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('menu').classList.remove('active');
+            });
+        });
+    </script>
+    
+</body>
+</html>
