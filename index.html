@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Name | Photography</title>
+    
+    <style>
+        /* ========================================
+           GLOBAL STYLES
+           Reset and base styles for the entire page
+        ======================================== */
+        
+        /* Remove default margins and padding from all elements */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body styling - mimics Alan Schaller's black background aesthetic */
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+            background-color: #000000; /* Pure black background */
+            color: #ffffff; /* White text for contrast */
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        
+        /* ========================================
+           NAVIGATION BAR
+           Fixed top navigation that stays visible when scrolling
+        ======================================== */
+        
+        nav {
+            position: fixed; /* Stays at top when scrolling */
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.98); /* Almost opaque black */
+            padding: 25px 0;
+            z-index: 1000; /* Appears above all other content */
+            border-bottom: 1px solid #222; /* Subtle border */
+            backdrop-filter: blur(10px); /* Blur effect for modern browsers */
+        }
+        
+        /* Navigation container - centers content and adds padding */
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+        
+        /* ========================================
+           LOGO SECTION
+           UPDATE: Change "YOUR NAME" text or use an image logo
+        ======================================== */
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+        
+        .logo:hover {
+            opacity: 0.7; /* Fade effect on hover */
+        }
+        
+        /* If using an image logo instead of text */
+        .logo img {
+            height: 50px;
+            width: auto;
+            /* UPDATE: Replace "logo.png" with your actual logo filename in the HTML below */
+        }
+        
+        /* ========================================
+           NAVIGATION MENU
+           Desktop menu styling
+        ======================================== */
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        /* Individual menu items */
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        /* Underline effect on hover */
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #ffffff;
+            transition: width 0.3s ease;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%; /* Underline expands on hover */
+        }
+        
+        nav ul li a:hover {
+            color: #cccccc; /* Slightly gray on hover */
+        }
+        
+        /* ========================================
+           MOBILE HAMBURGER MENU
+           Three-line icon that appears on mobile devices
+        ======================================== */
+        
+        .menu-toggle {
+            display: none; /* Hidden on desktop */
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            z-index: 1001;
+        }
+        
+        /* Three horizontal lines */
+        .menu-toggle span {
+            width: 28px;
+            height: 2px;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        /* ========================================
+           HERO SECTION
+           Main title area at the top of the page
+        ======================================== */
+        
+        .hero {
+            margin-top: 120px; /* Space below fixed navigation */
+            padding: 80px 40px;
+            text-align: center;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Main heading */
+        /* UPDATE: Change this text in the HTML section below */
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 200;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+        
+        /* Subtitle under main heading */
+        .hero .subtitle {
+            font-size: 13px;
+            color: #999999;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+        
+        /* ========================================
+           PHOTO GALLERY
+           Grid layout for displaying portfolio images
+        ======================================== */
+        
+        .gallery {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 40px;
+            display: grid;
+            /* Responsive grid: automatically creates columns based on screen size */
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        /* Individual photo container */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 3/2; /* Maintains consistent image proportions */
+            background-color: #111; /* Dark background while image loads */
+            cursor: pointer;
+            border: 1px solid #1a1a1a; /* Subtle border */
+        }
+        
+        /* ========================================
+           GALLERY IMAGES
+           UPDATE: Replace "photo-1.jpg" through "photo-6.jpg" 
+           with your actual image filenames in the HTML section
+        ======================================== */
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Crops image to fit without distortion */
+            display: block;
+            transition: transform 0.5s ease, opacity 0.3s ease;
+            opacity: 0.9;
+        }
+        
+        /* Zoom and brighten effect on hover */
+        .gallery-item:hover img {
+            transform: scale(1.08); /* Smooth zoom effect */
+            opacity: 1;
+        }
+        
+        /* Caption overlay that appears on hover */
+        .gallery-item .caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 30px 20px 20px;
+            color: #ffffff;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none; /* Doesn't block clicks */
+        }
+        
+        /* Caption title */
+        .gallery-item .caption p {
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        
+        /* Show caption on hover */
+        .gallery-item:hover .caption {
+            opacity: 1;
+        }
+        
+        /* ========================================
+           FOOTER
+           Bottom section with copyright information
+        ======================================== */
+        
+        footer {
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 1px solid #222;
+            margin-top: 100px;
+            background-color: #000000;
+        }
+        
+        /* Footer copyright text */
+        /* UPDATE: Replace "YOUR NAME" with your actual name in HTML below */
+        footer p {
+            font-size: 11px;
+            color: #666666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        
+        /* ========================================
+           RESPONSIVE DESIGN - TABLET
+           Styles for medium-sized screens (tablets)
+        ======================================== */
+        
+        @media (max-width: 1024px) {
+            nav .container {
+                padding: 0 30px;
+            }
+            
+            .hero {
+                padding: 60px 30px;
+            }
+            
+            .hero h1 {
+                font-size: 42px;
+            }
+            
+            .gallery {
+                padding: 0 30px;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+        }
+        
+        /* ========================================
+           RESPONSIVE DESIGN - MOBILE
+           Styles for small screens (phones)
+        ======================================== */
+        
+        @media (max-width: 768px) {
+            /* Navigation adjustments for mobile */
+            nav {
+                padding: 20px 0;
+            }
+            
+            nav .container {
+                padding: 0 20px;
+            }
+            
+            /* Hide desktop menu on mobile */
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.98);
+                padding: 100px 40px;
+                gap: 30px;
+                justify-content: flex-start;
+            }
+            
+            /* Show menu when hamburger is clicked */
+            nav ul.active {
+                display: flex;
+            }
+            
+            /* Menu items styling for mobile */
+            nav ul li a {
+                font-size: 16px;
+                letter-spacing: 3px;
+            }
+            
+            /* Show hamburger menu on mobile */
+            .menu-toggle {
+                display: flex;
+            }
+            
+            /* Hero section adjustments */
+            .hero {
+                margin-top: 80px;
+                padding: 50px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+                letter-spacing: 2px;
+            }
+            
+            .hero .subtitle {
+                font-size: 11px;
+                letter-spacing: 2px;
+            }
+            
+            /* Gallery adjustments - single column on mobile */
+            .gallery {
+                padding: 0 20px;
+                grid-template-columns: 1fr; /* One image per row */
+                gap: 20px;
+                margin: 50px auto;
+            }
+            
+            /* Adjust gallery item aspect ratio for mobile */
+            .gallery-item {
+                aspect-ratio: 4/3; /* Slightly taller on mobile */
+            }
+            
+            /* Footer adjustments */
+            footer {
+                padding: 40px 20px;
+                margin-top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ========================================
+         NAVIGATION BAR
+    ======================================== -->
+    <nav>
+        <div class="container">
+            
+            <!-- ========================================
+                 LOGO
+                 UPDATE: Replace "YOUR NAME" with your name/brand
+                 OR use an image logo (see commented line below)
+            ======================================== -->
+            <a href="#" class="logo">YOUR NAME</a>
+            
+            <!-- OPTIONAL: Use image logo instead of text -->
+            <!-- Remove the line above and uncomment this line to use an image logo: -->
+            <!-- UPDATE: Replace "logo.png" with your logo filename -->
+            <!-- <a href="#" class="logo"><img src="logo.png" alt="Your Name Logo"></a> -->
+            
+            <!-- Mobile hamburger menu button -->
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <!-- ========================================
+                 NAVIGATION MENU
+                 UPDATE: Change links to point to your actual pages
+                 Example: href="about.html" or href="#about"
+            ======================================== -->
+            <ul id="menu">
+                <li><a href="#about">About</a></li>
+                <li><a href="#series">Series</a></li>
+                <li><a href="#projects">Featured Projects</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- ========================================
+         HERO SECTION - Main Title Area
+    ======================================== -->
+    <section class="hero">
+        <!-- UPDATE: Change heading text to match your style -->
+        <h1>- Photography -</h1>
+        
+        <!-- UPDATE: Change subtitle to describe your photography style -->
+        <p class="subtitle">Street Photography - Fine Art Photography - Black and White Photography</p>
+    </section>
+    
+    <!-- ========================================
+         PHOTO GALLERY
+         Main portfolio image grid
+    ======================================== -->
+    <section class="gallery">
+        
+        <!-- ========================================
+             PHOTO 1
+             UPDATE: Replace "photo-1.jpg" with your image filename
+             All images should be in the same folder as this HTML file
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-1.jpg" alt="Photography Portfolio Image 1">
+            <div class="caption">
+                <p>Urban Geometry</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             PHOTO 2
+             UPDATE: Replace "photo-2.jpg" with your image filename
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-2.jpg" alt="Photography Portfolio Image 2">
+            <div class="caption">
+                <p>City Lights</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             PHOTO 3
+             UPDATE: Replace "photo-3.jpg" with your image filename
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-3.jpg" alt="Photography Portfolio Image 3">
+            <div class="caption">
+                <p>Shadows & Light</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             PHOTO 4
+             UPDATE: Replace "photo-4.jpg" with your image filename
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-4.jpg" alt="Photography Portfolio Image 4">
+            <div class="caption">
+                <p>Metropolitan</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             PHOTO 5
+             UPDATE: Replace "photo-5.jpg" with your image filename
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-5.jpg" alt="Photography Portfolio Image 5">
+            <div class="caption">
+                <p>Reflections</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             PHOTO 6
+             UPDATE: Replace "photo-6.jpg" with your image filename
+        ======================================== -->
+        <div class="gallery-item">
+            <img src="photo-6.jpg" alt="Photography Portfolio Image 6">
+            <div class="caption">
+                <p>Noir Series</p> <!-- UPDATE: Change caption text -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             TO ADD MORE PHOTOS:
+             Copy the entire gallery-item block above (from <div class="gallery-item"> 
+             to </div>) and paste it below this comment.
+             Then update the image filename and caption text.
+        ======================================== -->
+        
+    </section>
+    
+    <!-- ========================================
+         FOOTER - Copyright Section
+    ======================================== -->
+    <footer>
+        <!-- UPDATE: Replace "YOUR NAME" with your actual name -->
+        <p>© YOUR NAME - DESIGNED BY YOU</p>
+    </footer>
+    
+    <!-- ========================================
+         JAVASCRIPT - Interactive Functionality
+    ======================================== -->
+    <script>
+        /**
+         * Toggle mobile menu open/closed
+         * Called when hamburger icon is clicked
+         */
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('active');
+        }
+        
+        /**
+         * Close mobile menu when clicking any menu link
+         * Improves user experience on mobile devices
+         */
+        document.querySelectorAll('#menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('menu').classList.remove('active');
+            });
+        });
+        
+        /**
+         * Smooth scroll behavior for anchor links
+         * Optional: Uncomment if using anchor links like #about
+         */
+        /*
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        */
+    </script>
+    
+</body>
+</html>
+```
+
+**📋 QUICK REFERENCE - WHAT TO UPDATE:**
+
+1. **Line 86** - Logo text: `"YOUR NAME"`
+2. **Lines 168-173** - Photo 1: `photo-1.jpg`
+3. **Lines 180-185** - Photo 2: `photo-2.jpg`
+4. **Lines 192-197** - Photo 3: `photo-3.jpg`
+5. **Lines 204-209** - Photo 4: `photo-4.jpg`
+6. **Lines 216-221** - Photo 5: `photo-5.jpg`
+7. **Lines 228-233** - Photo 6: `photo-6.jpg`
+8. **Line 248** - Footer copyright: `"YOUR NAME"`
