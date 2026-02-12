@@ -1,3 +1,7 @@
+
+## 4. PROJECTS PAGE (projects.html) - Updated
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -140,7 +144,6 @@
         
         /* ========================================
            PROJECTS CONTAINER
-           Featured projects displayed vertically
         ======================================== */
         .projects-container {
             max-width: 1200px;
@@ -148,7 +151,6 @@
             padding: 0 40px;
         }
         
-        /* Individual project section */
         .project {
             margin-bottom: 120px;
             display: grid;
@@ -157,7 +159,6 @@
             align-items: center;
         }
         
-        /* Alternate layout for even projects */
         .project:nth-child(even) {
             direction: rtl;
         }
@@ -166,7 +167,6 @@
             direction: ltr;
         }
         
-        /* Project image container */
         .project-image {
             position: relative;
             overflow: hidden;
@@ -175,8 +175,6 @@
             border: 1px solid #1a1a1a;
         }
         
-        /* Project images */
-        /* UPDATE: Replace "project-1.jpg" through "project-3.jpg" with your project images */
         .project-image img {
             width: 100%;
             height: 100%;
@@ -188,7 +186,6 @@
             transform: scale(1.05);
         }
         
-        /* Project information */
         .project-info h2 {
             font-size: 36px;
             font-weight: 300;
@@ -205,8 +202,6 @@
             margin-bottom: 25px;
         }
         
-        /* Project description */
-        /* UPDATE: Add descriptions for each project in HTML below */
         .project-info p {
             font-size: 16px;
             line-height: 1.9;
@@ -215,7 +210,6 @@
             font-weight: 300;
         }
         
-        /* Project tags/categories */
         .project-tags {
             display: flex;
             flex-wrap: wrap;
@@ -233,7 +227,6 @@
             color: #999;
         }
         
-        /* View project link */
         .view-project {
             display: inline-block;
             margin-top: 25px;
@@ -364,188 +357,5 @@
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
-            
-            <ul id="menu">
-                <li><a href="about.html">About</a></li>
-                <li><a href="series.html">Series</a></li>
-                <li><a href="projects.html" class="active">Featured Projects</a></li>
-            </ul>
-        </div>
-    </nav>
-    
-    <!-- ========================================
-         PROJECTS PAGE HEADER
-    ======================================== -->
-    <section class="projects-header">
-        <h1>Featured Projects</h1>
-        <p>
-            Selected commissioned works, collaborations, and special photography 
-            projects that showcase diverse applications of my visual style.
-        </p>
-    </section>
-    
-    <!-- ========================================
-         PROJECTS LIST
-    ======================================== -->
-    <section class="projects-container">
-        
-        <!-- ========================================
-             PROJECT 1
-             UPDATE: Replace "project-1.jpg" with your project image
-        ======================================== -->
-        <div class="project">
-            <div class="project-image">
-                <img src="project-1.jpg" alt="Architecture Magazine Feature">
-            </div>
-            <div class="project-info">
-                <!-- UPDATE: Change project title -->
-                <h2>Architecture Magazine Feature</h2>
-                <!-- UPDATE: Change client/year -->
-                <p class="project-meta">Client: Architecture Digest | 2024</p>
-                <!-- UPDATE: Change project description -->
-                <p>
-                    A comprehensive photo essay exploring modernist architecture across 
-                    three major cities. This project required extensive travel and 
-                    precise timing to capture buildings in perfect light conditions.
-                </p>
-                <p>
-                    The series was featured as a 20-page spread in the publication's 
-                    annual design issue, highlighting the intersection of form, function, 
-                    and photographic composition.
-                </p>
-                <!-- UPDATE: Change tags -->
-                <div class="project-tags">
-                    <span class="tag">Architecture</span>
-                    <span class="tag">Editorial</span>
-                    <span class="tag">Commissioned</span>
-                </div>
-                <!-- UPDATE: Add link to project if available -->
-                <a href="#" class="view-project">View Project</a>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PROJECT 2
-             UPDATE: Replace "project-2.jpg" with your project image
-        ======================================== -->
-        <div class="project">
-            <div class="project-image">
-                <img src="project-2.jpg" alt="Urban Stories Exhibition">
-            </div>
-            <div class="project-info">
-                <h2>Urban Stories Exhibition</h2>
-                <p class="project-meta">Gallery: Modern Art Space | 2023</p>
-                <p>
-                    A solo exhibition featuring 40 large-format prints documenting the 
-                    daily rhythms of city life. The exhibition explored themes of movement, 
-                    stillness, and the poetry found in everyday urban moments.
-                </p>
-                <p>
-                    Curated to create an immersive experience, visitors moved through 
-                    spaces representing different times of day, from dawn to midnight, 
-                    experiencing the city's transformation through light and shadow.
-                </p>
-                <div class="project-tags">
-                    <span class="tag">Exhibition</span>
-                    <span class="tag">Fine Art</span>
-                    <span class="tag">Street Photography</span>
-                </div>
-                <a href="#" class="view-project">View Project</a>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PROJECT 3
-             UPDATE: Replace "project-3.jpg" with your project image
-        ======================================== -->
-        <div class="project">
-            <div class="project-image">
-                <img src="project-3.jpg" alt="Fashion Brand Campaign">
-            </div>
-            <div class="project-info">
-                <h2>Fashion Brand Campaign</h2>
-                <p class="project-meta">Client: [Brand Name] | 2023</p>
-                <p>
-                    A minimalist campaign photographed entirely in black and white, 
-                    focusing on geometric compositions and dramatic lighting. The project 
-                    challenged conventional fashion photography by emphasizing form and 
-                    shadow over traditional glamour.
-                </p>
-                <p>
-                    Shot on location across various urban environments, the campaign 
-                    successfully merged high fashion with architectural photography, 
-                    creating a distinctive visual identity for the brand's seasonal launch.
-                </p>
-                <div class="project-tags">
-                    <span class="tag">Fashion</span>
-                    <span class="tag">Commercial</span>
-                    <span class="tag">Campaign</span>
-                </div>
-                <a href="#" class="view-project">View Project</a>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             TO ADD MORE PROJECTS:
-             Copy one of the project blocks above and paste here.
-             Update the image filename, title, client, year, description, and tags.
-        ======================================== -->
-        
-    </section>
-    
-    <!-- ========================================
-         FOOTER
-    ======================================== -->
-    <footer>
-        <p>© YOUR NAME - DESIGNED BY YOU</p>
-    </footer>
-    
-    <!-- ========================================
-         JAVASCRIPT
-    ======================================== -->
-    <script>
-        // Toggle mobile menu
-        function toggleMenu() {
-            const menu = document.getElementById('menu');
-            menu.classList.toggle('active');
-        }
-        
-        // Close menu when clicking links
-        document.querySelectorAll('#menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('menu').classList.remove('active');
-            });
-        });
-    </script>
-    
-</body>
-</html>
-```
-
----
-
-## 📂 FILE STRUCTURE
-
-Your website files should be organized like this:
-
-```
-your-website/
-├── index.html          (Main homepage)
-├── about.html          (About page)
-├── series.html         (Series page)
-├── projects.html       (Projects page)
-├── photo-1.jpg         (Homepage photos)
-├── photo-2.jpg
-├── photo-3.jpg
-├── photo-4.jpg
-├── photo-5.jpg
-├── photo-6.jpg
-├── portrait.jpg        (Your portrait for About page)
-├── series-1.jpg        (Series cover images)
-├── series-2.jpg
-├── series-3.jpg
-├── series-4.jpg
-├── project-1.jpg       (Project images)
-├── project-2.jpg
-└── project-3.jpg
+ 
+...
