@@ -1,3 +1,6 @@
+## 3. SERIES PAGE (series.html) - Updated
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +26,7 @@
         }
         
         /* ========================================
-           NAVIGATION - Same as other pages
+           NAVIGATION
         ======================================== */
         nav {
             position: fixed;
@@ -140,7 +143,6 @@
         
         /* ========================================
            SERIES GRID
-           Grid of photography series/collections
         ======================================== */
         .series-grid {
             max-width: 1400px;
@@ -151,7 +153,6 @@
             gap: 60px;
         }
         
-        /* Individual series card */
         .series-card {
             cursor: pointer;
             transition: transform 0.3s ease;
@@ -161,7 +162,6 @@
             transform: translateY(-5px);
         }
         
-        /* Series cover image container */
         .series-image {
             position: relative;
             overflow: hidden;
@@ -171,8 +171,6 @@
             margin-bottom: 25px;
         }
         
-        /* Series cover images */
-        /* UPDATE: Replace "series-1.jpg" through "series-4.jpg" with your series cover images */
         .series-image img {
             width: 100%;
             height: 100%;
@@ -186,7 +184,6 @@
             opacity: 1;
         }
         
-        /* Dark overlay on hover */
         .series-image::after {
             content: '';
             position: absolute;
@@ -203,7 +200,6 @@
             opacity: 1;
         }
         
-        /* Series information */
         .series-info h2 {
             font-size: 28px;
             font-weight: 300;
@@ -220,8 +216,6 @@
             margin-bottom: 15px;
         }
         
-        /* Series description */
-        /* UPDATE: Add descriptions for each series in HTML below */
         .series-info p {
             font-size: 15px;
             line-height: 1.8;
@@ -347,95 +341,10 @@
     
     <!-- ========================================
          SERIES GRID
-         Photography series/collections
+         Series cards will be loaded dynamically
     ======================================== -->
-    <section class="series-grid">
-        
-        <!-- ========================================
-             SERIES 1
-             UPDATE: Replace "series-1.jpg" with your series cover image
-        ======================================== -->
-        <div class="series-card">
-            <div class="series-image">
-                <img src="series-1.jpg" alt="Metropolis Series">
-            </div>
-            <div class="series-info">
-                <!-- UPDATE: Change series title -->
-                <h2>Metropolis</h2>
-                <!-- UPDATE: Change year and number of images -->
-                <p class="series-meta">2024 | 45 Images</p>
-                <!-- UPDATE: Change series description -->
-                <p>
-                    An exploration of urban architecture and the interplay between 
-                    geometric forms and natural light. This series captures the essence 
-                    of modern city life through stark contrasts and minimalist compositions.
-                </p>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             SERIES 2
-             UPDATE: Replace "series-2.jpg" with your series cover image
-        ======================================== -->
-        <div class="series-card">
-            <div class="series-image">
-                <img src="series-2.jpg" alt="Shadows Series">
-            </div>
-            <div class="series-info">
-                <h2>Shadows</h2>
-                <p class="series-meta">2023 | 32 Images</p>
-                <p>
-                    A study in contrast and negative space. This series examines how shadows 
-                    create their own narratives, transforming ordinary scenes into abstract 
-                    compositions of light and dark.
-                </p>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             SERIES 3
-             UPDATE: Replace "series-3.jpg" with your series cover image
-        ======================================== -->
-        <div class="series-card">
-            <div class="series-image">
-                <img src="series-3.jpg" alt="Solitude Series">
-            </div>
-            <div class="series-info">
-                <h2>Solitude</h2>
-                <p class="series-meta">2023 | 28 Images</p>
-                <p>
-                    Capturing moments of isolation within crowded urban environments. 
-                    This series focuses on the individual experience of being alone in 
-                    the midst of millions.
-                </p>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             SERIES 4
-             UPDATE: Replace "series-4.jpg" with your series cover image
-        ======================================== -->
-        <div class="series-card">
-            <div class="series-image">
-                <img src="series-4.jpg" alt="Nocturne Series">
-            </div>
-            <div class="series-info">
-                <h2>Nocturne</h2>
-                <p class="series-meta">2022-2024 | 52 Images | Ongoing</p>
-                <p>
-                    An ongoing documentation of the city after dark. Nocturne explores 
-                    the transformation of familiar spaces under artificial light, revealing 
-                    a different character of urban life.
-                </p>
-            </div>
-        </div>
-        
-        <!-- ========================================
-             TO ADD MORE SERIES:
-             Copy one of the series-card blocks above and paste here.
-             Update the image filename, title, year, count, and description.
-        ======================================== -->
-        
+    <section class="series-grid" id="seriesGrid">
+        <!-- Series cards will be inserted here by JavaScript -->
     </section>
     
     <!-- ========================================
@@ -449,19 +358,135 @@
          JAVASCRIPT
     ======================================== -->
     <script>
-        // Toggle mobile menu
+        /* ========================================================================
+           📸 IMAGE CONFIGURATION - UPDATE ALL YOUR SERIES IMAGES HERE
+           ======================================================================== */
+        
+        const CONFIG = {
+            // SERIES COLLECTION
+            // UPDATE: Replace image filenames, titles, years, counts, and descriptions
+            // You can add or remove series from this list
+            series: [
+                {
+                    image: 'series-1.jpg',        // Series cover image filename
+                    title: 'Metropolis',          // Series title
+                    year: '2024',                 // Year or year range
+                    imageCount: '45 Images',      // Number of images in series
+                    description: 'An exploration of urban architecture and the interplay between geometric forms and natural light. This series captures the essence of modern city life through stark contrasts and minimalist compositions.'
+                },
+                {
+                    image: 'series-2.jpg',
+                    title: 'Shadows',
+                    year: '2023',
+                    imageCount: '32 Images',
+                    description: 'A study in contrast and negative space. This series examines how shadows create their own narratives, transforming ordinary scenes into abstract compositions of light and dark.'
+                },
+                {
+                    image: 'series-3.jpg',
+                    title: 'Solitude',
+                    year: '2023',
+                    imageCount: '28 Images',
+                    description: 'Capturing moments of isolation within crowded urban environments. This series focuses on the individual experience of being alone in the midst of millions.'
+                },
+                {
+                    image: 'series-4.jpg',
+                    title: 'Nocturne',
+                    year: '2022-2024',
+                    imageCount: '52 Images | Ongoing',
+                    description: 'An ongoing documentation of the city after dark. Nocturne explores the transformation of familiar spaces under artificial light, revealing a different character of urban life.'
+                }
+                
+                // TO ADD MORE SERIES: Copy the block above and paste here
+                // Example:
+                // ,
+                // {
+                //     image: 'series-5.jpg',
+                //     title: 'New Series Title',
+                //     year: '2025',
+                //     imageCount: '20 Images',
+                //     description: 'Description of your new series...'
+                // }
+            ]
+        };
+        
+        /* ========================================================================
+           DO NOT EDIT BELOW THIS LINE
+        ======================================================================== */
+        
+        /**
+         * Dynamically create and load series cards from CONFIG
+         */
+        function loadSeries() {
+            const grid = document.getElementById('seriesGrid');
+            
+            CONFIG.series.forEach(series => {
+                // Create series card
+                const card = document.createElement('div');
+                card.className = 'series-card';
+                
+                // Create image container
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'series-image';
+                const img = document.createElement('img');
+                img.src = series.image;
+                img.alt = series.title + ' Series';
+                imageDiv.appendChild(img);
+                
+                // Create info container
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'series-info';
+                
+                const title = document.createElement('h2');
+                title.textContent = series.title;
+                
+                const meta = document.createElement('p');
+                meta.className = 'series-meta';
+                meta.textContent = `${series.year} | ${series.imageCount}`;
+                
+                const description = document.createElement('p');
+                description.textContent = series.description;
+                
+                infoDiv.appendChild(title);
+                infoDiv.appendChild(meta);
+                infoDiv.appendChild(description);
+                
+                // Assemble card
+                card.appendChild(imageDiv);
+                card.appendChild(infoDiv);
+                
+                // Add to grid
+                grid.appendChild(card);
+            });
+        }
+        
+        /**
+         * Toggle mobile menu
+         */
         function toggleMenu() {
             const menu = document.getElementById('menu');
             menu.classList.toggle('active');
         }
         
-        // Close menu when clicking links
-        document.querySelectorAll('#menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('menu').classList.remove('active');
+        /**
+         * Close menu when clicking links
+         */
+        function setupMenuLinks() {
+            document.querySelectorAll('#menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('menu').classList.remove('active');
+                });
             });
+        }
+        
+        /**
+         * Initialize on page load
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSeries();
+            setupMenuLinks();
         });
     </script>
     
 </body>
 </html>
+```
