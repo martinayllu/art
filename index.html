@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +57,6 @@
         
         /* ========================================
            LOGO SECTION
-           UPDATE: Change "YOUR NAME" text or use an image logo
         ======================================== */
         
         .logo {
@@ -77,7 +77,6 @@
         .logo img {
             height: 50px;
             width: auto;
-            /* UPDATE: Replace "logo.png" with your actual logo filename in the HTML below */
         }
         
         /* ========================================
@@ -160,7 +159,6 @@
         }
         
         /* Main heading */
-        /* UPDATE: Change this text in the HTML section below */
         .hero h1 {
             font-size: 56px;
             font-weight: 200;
@@ -204,12 +202,7 @@
             border: 1px solid #1a1a1a; /* Subtle border */
         }
         
-        /* ========================================
-           GALLERY IMAGES
-           UPDATE: Replace "photo-1.jpg" through "photo-6.jpg" 
-           with your actual image filenames in the HTML section
-        ======================================== */
-        
+        /* Gallery images */
         .gallery-item img {
             width: 100%;
             height: 100%;
@@ -266,7 +259,6 @@
         }
         
         /* Footer copyright text */
-        /* UPDATE: Replace "YOUR NAME" with your actual name in HTML below */
         footer p {
             font-size: 11px;
             color: #666666;
@@ -391,17 +383,12 @@
     <nav>
         <div class="container">
             
-            <!-- ========================================
-                 LOGO
-                 UPDATE: Replace "YOUR NAME" with your name/brand
-                 OR use an image logo (see commented line below)
-            ======================================== -->
+            <!-- LOGO -->
+            <!-- UPDATE: Replace "YOUR NAME" with your name/brand -->
             <a href="#" class="logo">YOUR NAME</a>
             
-            <!-- OPTIONAL: Use image logo instead of text -->
-            <!-- Remove the line above and uncomment this line to use an image logo: -->
-            <!-- UPDATE: Replace "logo.png" with your logo filename -->
-            <!-- <a href="#" class="logo"><img src="logo.png" alt="Your Name Logo"></a> -->
+            <!-- OPTIONAL: Use image logo instead -->
+            <!-- <a href="#" class="logo"><img src="" id="logoImage" alt="Your Name Logo"></a> -->
             
             <!-- Mobile hamburger menu button -->
             <div class="menu-toggle" onclick="toggleMenu()">
@@ -410,15 +397,11 @@
                 <span></span>
             </div>
             
-            <!-- ========================================
-                 NAVIGATION MENU
-                 UPDATE: Change links to point to your actual pages
-                 Example: href="about.html" or href="#about"
-            ======================================== -->
+            <!-- Navigation Menu -->
             <ul id="menu">
-                <li><a href="#about">About</a></li>
-                <li><a href="#series">Series</a></li>
-                <li><a href="#projects">Featured Projects</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="series.html">Series</a></li>
+                <li><a href="projects.html">Featured Projects</a></li>
             </ul>
         </div>
     </nav>
@@ -427,93 +410,16 @@
          HERO SECTION - Main Title Area
     ======================================== -->
     <section class="hero">
-        <!-- UPDATE: Change heading text to match your style -->
         <h1>- Photography -</h1>
-        
-        <!-- UPDATE: Change subtitle to describe your photography style -->
         <p class="subtitle">Street Photography - Fine Art Photography - Black and White Photography</p>
     </section>
     
     <!-- ========================================
          PHOTO GALLERY
-         Main portfolio image grid
+         Images will be loaded dynamically from JavaScript
     ======================================== -->
-    <section class="gallery">
-        
-        <!-- ========================================
-             PHOTO 1
-             UPDATE: Replace "photo-1.jpg" with your image filename
-             All images should be in the same folder as this HTML file
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-1.jpg" alt="Photography Portfolio Image 1">
-            <div class="caption">
-                <p>Urban Geometry</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PHOTO 2
-             UPDATE: Replace "photo-2.jpg" with your image filename
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-2.jpg" alt="Photography Portfolio Image 2">
-            <div class="caption">
-                <p>City Lights</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PHOTO 3
-             UPDATE: Replace "photo-3.jpg" with your image filename
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-3.jpg" alt="Photography Portfolio Image 3">
-            <div class="caption">
-                <p>Shadows & Light</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PHOTO 4
-             UPDATE: Replace "photo-4.jpg" with your image filename
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-4.jpg" alt="Photography Portfolio Image 4">
-            <div class="caption">
-                <p>Metropolitan</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PHOTO 5
-             UPDATE: Replace "photo-5.jpg" with your image filename
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-5.jpg" alt="Photography Portfolio Image 5">
-            <div class="caption">
-                <p>Reflections</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             PHOTO 6
-             UPDATE: Replace "photo-6.jpg" with your image filename
-        ======================================== -->
-        <div class="gallery-item">
-            <img src="photo-6.jpg" alt="Photography Portfolio Image 6">
-            <div class="caption">
-                <p>Noir Series</p> <!-- UPDATE: Change caption text -->
-            </div>
-        </div>
-        
-        <!-- ========================================
-             TO ADD MORE PHOTOS:
-             Copy the entire gallery-item block above (from <div class="gallery-item"> 
-             to </div>) and paste it below this comment.
-             Then update the image filename and caption text.
-        ======================================== -->
-        
+    <section class="gallery" id="gallery">
+        <!-- Gallery items will be inserted here by JavaScript -->
     </section>
     
     <!-- ========================================
@@ -528,9 +434,117 @@
          JAVASCRIPT - Interactive Functionality
     ======================================== -->
     <script>
+        /* ========================================================================
+           📸 IMAGE CONFIGURATION - UPDATE ALL YOUR IMAGE FILENAMES HERE
+           ========================================================================
+           This is the ONLY place you need to update image filenames!
+           All images below will be automatically loaded into the gallery.
+        ======================================================================== */
+        
+        const CONFIG = {
+            // LOGO IMAGE (optional - only if using image logo instead of text)
+            // Remove the comment marks (//) below if you want to use an image logo
+            // logoImage: 'logo.png',
+            
+            // GALLERY PHOTOS
+            // UPDATE: Replace these filenames with your actual photo filenames
+            // You can add or remove photos from this list
+            galleryPhotos: [
+                {
+                    image: 'photo-1.jpg',        // Image filename
+                    title: 'Urban Geometry',      // Caption that appears on hover
+                    alt: 'Photography Portfolio Image 1'  // Alt text for accessibility
+                },
+                {
+                    image: 'photo-2.jpg',
+                    title: 'City Lights',
+                    alt: 'Photography Portfolio Image 2'
+                },
+                {
+                    image: 'photo-3.jpg',
+                    title: 'Shadows & Light',
+                    alt: 'Photography Portfolio Image 3'
+                },
+                {
+                    image: 'photo-4.jpg',
+                    title: 'Metropolitan',
+                    alt: 'Photography Portfolio Image 4'
+                },
+                {
+                    image: 'photo-5.jpg',
+                    title: 'Reflections',
+                    alt: 'Photography Portfolio Image 5'
+                },
+                {
+                    image: 'photo-6.jpg',
+                    title: 'Noir Series',
+                    alt: 'Photography Portfolio Image 6'
+                }
+                
+                // TO ADD MORE PHOTOS: Copy the block above and paste here
+                // Example:
+                // ,
+                // {
+                //     image: 'photo-7.jpg',
+                //     title: 'New Photo Title',
+                //     alt: 'Photography Portfolio Image 7'
+                // }
+            ]
+        };
+        
+        /* ========================================================================
+           DO NOT EDIT BELOW THIS LINE (unless you know what you're doing)
+           ========================================================================
+           The code below automatically loads images from the CONFIG object above
+        ======================================================================== */
+        
+        /**
+         * Load logo image if configured
+         */
+        function loadLogo() {
+            if (CONFIG.logoImage) {
+                const logoImg = document.getElementById('logoImage');
+                if (logoImg) {
+                    logoImg.src = CONFIG.logoImage;
+                }
+            }
+        }
+        
+        /**
+         * Dynamically create and load gallery images from CONFIG
+         */
+        function loadGallery() {
+            const gallery = document.getElementById('gallery');
+            
+            // Loop through each photo in the CONFIG
+            CONFIG.galleryPhotos.forEach(photo => {
+                // Create gallery item container
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                
+                // Create image element
+                const img = document.createElement('img');
+                img.src = photo.image;
+                img.alt = photo.alt;
+                
+                // Create caption element
+                const caption = document.createElement('div');
+                caption.className = 'caption';
+                const captionText = document.createElement('p');
+                captionText.textContent = photo.title;
+                caption.appendChild(captionText);
+                
+                // Assemble gallery item
+                galleryItem.appendChild(img);
+                galleryItem.appendChild(caption);
+                
+                // Add to gallery
+                gallery.appendChild(galleryItem);
+            });
+        }
+        
         /**
          * Toggle mobile menu open/closed
-         * Called when hamburger icon is clicked
          */
         function toggleMenu() {
             const menu = document.getElementById('menu');
@@ -539,45 +553,26 @@
         
         /**
          * Close mobile menu when clicking any menu link
-         * Improves user experience on mobile devices
          */
-        document.querySelectorAll('#menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('menu').classList.remove('active');
+        function setupMenuLinks() {
+            document.querySelectorAll('#menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('menu').classList.remove('active');
+                });
             });
-        });
+        }
         
         /**
-         * Smooth scroll behavior for anchor links
-         * Optional: Uncomment if using anchor links like #about
+         * Initialize everything when page loads
          */
-        /*
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLogo();
+            loadGallery();
+            setupMenuLinks();
         });
-        */
     </script>
     
 </body>
 </html>
 ```
 
-**📋 QUICK REFERENCE - WHAT TO UPDATE:**
-
-1. **Line 86** - Logo text: `"YOUR NAME"`
-2. **Lines 168-173** - Photo 1: `photo-1.jpg`
-3. **Lines 180-185** - Photo 2: `photo-2.jpg`
-4. **Lines 192-197** - Photo 3: `photo-3.jpg`
-5. **Lines 204-209** - Photo 4: `photo-4.jpg`
-6. **Lines 216-221** - Photo 5: `photo-5.jpg`
-7. **Lines 228-233** - Photo 6: `photo-6.jpg`
-8. **Line 248** - Footer copyright: `"YOUR NAME"`
