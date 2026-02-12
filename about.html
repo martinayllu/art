@@ -1,3 +1,6 @@
+## 2. ABOUT PAGE (about.html) - Updated
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +26,7 @@
         }
         
         /* ========================================
-           NAVIGATION BAR - Same as main page
+           NAVIGATION BAR
         ======================================== */
         nav {
             position: fixed;
@@ -46,8 +49,6 @@
             padding: 0 40px;
         }
         
-        /* Logo */
-        /* UPDATE: Change "YOUR NAME" or link to index.html */
         .logo {
             font-size: 20px;
             font-weight: 400;
@@ -62,7 +63,6 @@
             opacity: 0.7;
         }
         
-        /* Navigation menu */
         nav ul {
             list-style: none;
             display: flex;
@@ -81,7 +81,6 @@
             position: relative;
         }
         
-        /* Active page indicator */
         nav ul li a.active {
             color: #cccccc;
         }
@@ -102,7 +101,6 @@
             width: 100%;
         }
         
-        /* Mobile hamburger menu */
         .menu-toggle {
             display: none;
             flex-direction: column;
@@ -121,14 +119,12 @@
            ABOUT PAGE CONTENT
         ======================================== */
         
-        /* Main content container */
         .about-container {
             max-width: 1200px;
             margin: 150px auto 80px;
             padding: 0 40px;
         }
         
-        /* Two-column layout for desktop */
         .about-content {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
@@ -136,7 +132,6 @@
             align-items: start;
         }
         
-        /* Left column - Photo section */
         .about-photo {
             position: sticky;
             top: 150px;
@@ -146,7 +141,6 @@
             width: 100%;
             height: auto;
             border: 1px solid #222;
-            /* UPDATE: Replace "portrait.jpg" with your portrait photo filename */
         }
         
         .photo-caption {
@@ -157,7 +151,6 @@
             text-transform: uppercase;
         }
         
-        /* Right column - Text content */
         .about-text h1 {
             font-size: 48px;
             font-weight: 200;
@@ -175,8 +168,6 @@
             color: #cccccc;
         }
         
-        /* Paragraph styling */
-        /* UPDATE: Add your biography and information in the HTML below */
         .about-text p {
             font-size: 16px;
             line-height: 1.9;
@@ -185,7 +176,6 @@
             font-weight: 300;
         }
         
-        /* First paragraph - larger text */
         .about-text p.intro {
             font-size: 20px;
             line-height: 1.8;
@@ -193,7 +183,6 @@
             margin-bottom: 40px;
         }
         
-        /* Quote styling */
         .quote {
             font-size: 24px;
             font-style: italic;
@@ -205,7 +194,6 @@
             font-weight: 300;
         }
         
-        /* Awards/Achievements list */
         .achievements {
             margin-top: 40px;
         }
@@ -339,7 +327,6 @@
     ======================================== -->
     <nav>
         <div class="container">
-            <!-- UPDATE: Link back to homepage -->
             <a href="index.html" class="logo">YOUR NAME</a>
             
             <div class="menu-toggle" onclick="toggleMenu()">
@@ -348,7 +335,6 @@
                 <span></span>
             </div>
             
-            <!-- UPDATE: Change href to match your filenames -->
             <ul id="menu">
                 <li><a href="about.html" class="active">About</a></li>
                 <li><a href="series.html">Series</a></li>
@@ -365,24 +351,21 @@
             
             <!-- Left Column - Portrait Photo -->
             <div class="about-photo">
-                <!-- UPDATE: Replace "portrait.jpg" with your portrait photo filename -->
-                <img src="portrait.jpg" alt="Your Name Portrait">
-                <p class="photo-caption">Portrait, 2024</p>
+                <!-- Image will be loaded by JavaScript -->
+                <img id="portraitImage" alt="Your Name Portrait">
+                <p class="photo-caption" id="portraitCaption"></p>
             </div>
             
             <!-- Right Column - Biography Text -->
             <div class="about-text">
-                <!-- UPDATE: Replace with your name -->
                 <h1>About</h1>
                 
-                <!-- UPDATE: Replace with your introduction -->
                 <p class="intro">
                     I am a photographer based in [YOUR CITY], specializing in black and white 
                     street photography and fine art photography. My work explores the relationship 
                     between light, shadow, and urban geometry.
                 </p>
                 
-                <!-- UPDATE: Replace with your story -->
                 <p>
                     Photography has been my passion for over [NUMBER] years. I began my journey 
                     in [YEAR] and have since dedicated myself to capturing the essence of urban 
@@ -395,12 +378,10 @@
                     beauty in the mundane and poetry in the everyday.
                 </p>
                 
-                <!-- Optional Quote Section -->
                 <div class="quote">
                     "Photography is the art of seeing what others overlook."
                 </div>
                 
-                <!-- UPDATE: Add your background information -->
                 <h2>Background</h2>
                 <p>
                     Born in [CITY], I developed an early interest in visual arts. After studying 
@@ -414,8 +395,6 @@
                     and collaborations.
                 </p>
                 
-                <!-- Achievements/Awards Section -->
-                <!-- UPDATE: Add your actual achievements -->
                 <h2>Recognition</h2>
                 <div class="achievements">
                     <ul>
@@ -427,7 +406,6 @@
                     </ul>
                 </div>
                 
-                <!-- Contact/Social Section -->
                 <h2>Contact</h2>
                 <p>
                     For inquiries, collaborations, or print purchases, please contact me at 
@@ -451,20 +429,58 @@
          JAVASCRIPT
     ======================================== -->
     <script>
-        // Toggle mobile menu
+        /* ========================================================================
+           📸 IMAGE CONFIGURATION - UPDATE YOUR IMAGE FILENAME HERE
+           ======================================================================== */
+        
+        const CONFIG = {
+            // PORTRAIT PHOTO
+            // UPDATE: Replace 'portrait.jpg' with your portrait photo filename
+            portraitImage: 'portrait.jpg',
+            portraitCaption: 'Portrait, 2024'  // UPDATE: Change caption if needed
+        };
+        
+        /* ========================================================================
+           DO NOT EDIT BELOW THIS LINE
+        ======================================================================== */
+        
+        /**
+         * Load portrait image from CONFIG
+         */
+        function loadPortrait() {
+            document.getElementById('portraitImage').src = CONFIG.portraitImage;
+            document.getElementById('portraitCaption').textContent = CONFIG.portraitCaption;
+        }
+        
+        /**
+         * Toggle mobile menu
+         */
         function toggleMenu() {
             const menu = document.getElementById('menu');
             menu.classList.toggle('active');
         }
         
-        // Close menu when clicking links
-        document.querySelectorAll('#menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('menu').classList.remove('active');
+        /**
+         * Close menu when clicking links
+         */
+        function setupMenuLinks() {
+            document.querySelectorAll('#menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('menu').classList.remove('active');
+                });
             });
+        }
+        
+        /**
+         * Initialize on page load
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPortrait();
+            setupMenuLinks();
         });
     </script>
     
 </body>
 </html>
 ```
+
