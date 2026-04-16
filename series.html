@@ -1,13 +1,10 @@
-## 3. SERIES PAGE (series.html) - Updated
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Series | Your Name</title>
-    
+
     <style>
         /* ========================================
            GLOBAL STYLES
@@ -17,130 +14,112 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
             line-height: 1.6;
         }
-        
+
         /* ========================================
            NAVIGATION
         ======================================== */
         nav {
             position: fixed;
             top: 0;
-            left: 0;
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.98);
+            background: rgba(0, 0, 0, 0.98);
             padding: 25px 0;
             z-index: 1000;
             border-bottom: 1px solid #222;
             backdrop-filter: blur(10px);
         }
-        
+
         nav .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 40px;
         }
-        
+
         .logo {
             font-size: 20px;
-            font-weight: 400;
             letter-spacing: 3px;
-            color: #ffffff;
-            text-decoration: none;
             text-transform: uppercase;
-            transition: opacity 0.3s ease;
+            text-decoration: none;
+            color: white;
         }
-        
-        .logo:hover {
-            opacity: 0.7;
-        }
-        
+
         nav ul {
             list-style: none;
             display: flex;
             gap: 40px;
-            align-items: center;
         }
-        
-        nav ul li a {
-            color: #ffffff;
-            text-decoration: none;
+
+        nav ul a {
             font-size: 13px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            font-weight: 300;
-            transition: color 0.3s ease;
+            text-decoration: none;
+            color: white;
             position: relative;
         }
-        
-        nav ul li a.active {
-            color: #cccccc;
-        }
-        
-        nav ul li a::after {
+
+        nav ul a::after {
             content: '';
             position: absolute;
             bottom: -5px;
             left: 0;
             width: 0;
             height: 1px;
-            background-color: #ffffff;
-            transition: width 0.3s ease;
+            background: white;
+            transition: width .3s ease;
         }
-        
-        nav ul li a:hover::after,
-        nav ul li a.active::after {
+
+        nav ul a:hover::after {
             width: 100%;
         }
-        
+
         .menu-toggle {
             display: none;
             flex-direction: column;
-            cursor: pointer;
             gap: 6px;
+            cursor: pointer;
         }
-        
+
         .menu-toggle span {
             width: 28px;
             height: 2px;
-            background-color: #ffffff;
-            transition: all 0.3s ease;
+            background: white;
         }
-        
+
         /* ========================================
-           SERIES PAGE HEADER
+           HEADER
         ======================================== */
         .series-header {
             margin-top: 120px;
-            padding: 80px 40px 60px;
+            padding: 80px 40px;
             text-align: center;
-            max-width: 1000px;
+            max-width: 900px;
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .series-header h1 {
             font-size: 56px;
             font-weight: 200;
             letter-spacing: 4px;
             margin-bottom: 30px;
         }
-        
+
         .series-header p {
-            font-size: 16px;
             color: #999;
             letter-spacing: 2px;
-            line-height: 1.8;
         }
-        
+
         /* ========================================
            SERIES GRID
         ======================================== */
@@ -152,62 +131,43 @@
             grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 60px;
         }
-        
+
         .series-card {
-            cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: transform .3s ease;
         }
-        
+
         .series-card:hover {
             transform: translateY(-5px);
         }
-        
+
         .series-image {
-            position: relative;
+            aspect-ratio: 4 / 3;
             overflow: hidden;
-            aspect-ratio: 4/3;
-            background-color: #111;
             border: 1px solid #1a1a1a;
             margin-bottom: 25px;
+            position: relative;
         }
-        
+
         .series-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease, opacity 0.3s ease;
             opacity: 0.85;
+            transition: transform .5s ease, opacity .3s ease;
         }
-        
-        .series-card:hover .series-image img {
+
+        .series-card:hover img {
             transform: scale(1.05);
             opacity: 1;
         }
-        
-        .series-image::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .series-card:hover .series-image::after {
-            opacity: 1;
-        }
-        
+
         .series-info h2 {
             font-size: 28px;
             font-weight: 300;
             letter-spacing: 2px;
-            margin-bottom: 15px;
-            color: #ffffff;
+            margin-bottom: 10px;
         }
-        
+
         .series-meta {
             font-size: 12px;
             color: #666;
@@ -215,14 +175,12 @@
             text-transform: uppercase;
             margin-bottom: 15px;
         }
-        
+
         .series-info p {
-            font-size: 15px;
-            line-height: 1.8;
             color: #999;
-            font-weight: 300;
+            font-size: 15px;
         }
-        
+
         /* ========================================
            FOOTER
         ======================================== */
@@ -232,261 +190,154 @@
             border-top: 1px solid #222;
             margin-top: 100px;
         }
-        
+
         footer p {
             font-size: 11px;
-            color: #666666;
             letter-spacing: 2px;
-            text-transform: uppercase;
+            color: #666;
         }
-        
+
         /* ========================================
-           RESPONSIVE - TABLET
-        ======================================== */
-        @media (max-width: 1024px) {
-            .series-grid {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-        }
-        
-        /* ========================================
-           RESPONSIVE - MOBILE
+           MOBILE
         ======================================== */
         @media (max-width: 768px) {
-            nav {
-                padding: 20px 0;
+            .series-header h1 {
+                font-size: 32px;
             }
-            
-            nav .container {
+
+            .series-grid {
+                grid-template-columns: 1fr;
                 padding: 0 20px;
             }
-            
-            nav ul {
-                display: none;
-                flex-direction: column;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.98);
-                padding: 100px 40px;
-                gap: 30px;
-                justify-content: flex-start;
-            }
-            
-            nav ul.active {
-                display: flex;
-            }
-            
+
             .menu-toggle {
                 display: flex;
             }
-            
-            .series-header {
-                margin-top: 80px;
-                padding: 50px 20px 40px;
+
+            nav ul {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: black;
+                padding: 100px 40px;
+                flex-direction: column;
             }
-            
-            .series-header h1 {
-                font-size: 32px;
-                letter-spacing: 2px;
-            }
-            
-            .series-grid {
-                padding: 0 20px;
-                gap: 40px;
-            }
-            
-            .series-info h2 {
-                font-size: 22px;
+
+            nav ul.active {
+                display: flex;
             }
         }
     </style>
 </head>
+
 <body>
-    
-    <!-- ========================================
-         NAVIGATION
-    ======================================== -->
-    <nav>
-        <div class="container">
-            <a href="index.html" class="logo">YOUR NAME</a>
-            
-            <div class="menu-toggle" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            
-            <ul id="menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="series.html">Series</a></li>
-            </ul>
+
+<nav>
+    <div class="container">
+        <a href="index.html" class="logo">YOUR NAME</a>
+
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
         </div>
-    </nav>
-    
-    <!-- ========================================
-         SERIES PAGE HEADER
-    ======================================== -->
-    <section class="series-header">
-        <h1>Series</h1>
-        <p>
-            Ongoing and completed photographic series exploring themes of urban life, 
-            light, shadow, and human connection through a minimalist lens.
-        </p>
-    </section>
-    
-    <!-- ========================================
-         SERIES GRID
-         Series cards will be loaded dynamically
-    ======================================== -->
-    <section class="series-grid" id="seriesGrid">
-        <!-- Series cards will be inserted here by JavaScript -->
-    </section>
-    
-    <!-- ========================================
-         FOOTER
-    ======================================== -->
-    <footer>
-        <p>© YOUR NAME - DESIGNED BY YOU</p>
-    </footer>
-    
-    <!-- ========================================
-         JAVASCRIPT
-    ======================================== -->
-    <script>
-        /* ========================================================================
-           📸 IMAGE CONFIGURATION - UPDATE ALL YOUR SERIES IMAGES HERE
-           ======================================================================== */
-        
-        const CONFIG = {
-            // SERIES COLLECTION
-            // UPDATE: Replace image filenames, titles, years, counts, and descriptions
-            // You can add or remove series from this list
-            series: [
-                {
-                    image: 'series-1.jpg',        // Series cover image filename
-                    title: 'Metropolis',          // Series title
-                    year: '2024',                 // Year or year range
-                    imageCount: '45 Images',      // Number of images in series
-                    description: 'An exploration of urban architecture and the interplay between geometric forms and natural light. This series captures the essence of modern city life through stark contrasts and minimalist compositions.'
-                },
-                {
-                    image: 'series-2.jpg',
-                    title: 'Shadows',
-                    year: '2023',
-                    imageCount: '32 Images',
-                    description: 'A study in contrast and negative space. This series examines how shadows create their own narratives, transforming ordinary scenes into abstract compositions of light and dark.'
-                },
-                {
-                    image: 'series-3.jpg',
-                    title: 'Solitude',
-                    year: '2023',
-                    imageCount: '28 Images',
-                    description: 'Capturing moments of isolation within crowded urban environments. This series focuses on the individual experience of being alone in the midst of millions.'
-                },
-                {
-                    image: 'series-4.jpg',
-                    title: 'Nocturne',
-                    year: '2022-2024',
-                    imageCount: '52 Images | Ongoing',
-                    description: 'An ongoing documentation of the city after dark. Nocturne explores the transformation of familiar spaces under artificial light, revealing a different character of urban life.'
-                }
-                
-                // TO ADD MORE SERIES: Copy the block above and paste here
-                // Example:
-                // ,
-                // {
-                //     image: 'series-5.jpg',
-                //     title: 'New Series Title',
-                //     year: '2025',
-                //     imageCount: '20 Images',
-                //     description: 'Description of your new series...'
-                // }
-            ]
-        };
-        
-        /* ========================================================================
-           DO NOT EDIT BELOW THIS LINE
-        ======================================================================== */
-        
-        /**
-         * Dynamically create and load series cards from CONFIG
-         */
-        function loadSeries() {
-            const grid = document.getElementById('seriesGrid');
-            
-            CONFIG.series.forEach(series => {
-                // Create series card
-                const card = document.createElement('div');
-                card.className = 'series-card';
-                
-                // Create image container
-                const imageDiv = document.createElement('div');
-                imageDiv.className = 'series-image';
-                const img = document.createElement('img');
-                img.src = series.image;
-                img.alt = series.title + ' Series';
-                imageDiv.appendChild(img);
-                
-                // Create info container
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'series-info';
-                
-                const title = document.createElement('h2');
-                title.textContent = series.title;
-                
-                const meta = document.createElement('p');
-                meta.className = 'series-meta';
-                meta.textContent = `${series.year} | ${series.imageCount}`;
-                
-                const description = document.createElement('p');
-                description.textContent = series.description;
-                
-                infoDiv.appendChild(title);
-                infoDiv.appendChild(meta);
-                infoDiv.appendChild(description);
-                
-                // Assemble card
-                card.appendChild(imageDiv);
-                card.appendChild(infoDiv);
-                
-                // Add to grid
-                grid.appendChild(card);
-            });
+
+        <ul id="menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="series.html">Series</a></li>
+        </ul>
+    </div>
+</nav>
+
+<section class="series-header">
+    <h1>Series</h1>
+    <p>Ongoing and completed photographic series exploring urban life, light, and solitude.</p>
+</section>
+
+<section class="series-grid" id="seriesGrid"></section>
+
+<footer>
+    <p>© YOUR NAME</p>
+</footer>
+
+<script>
+const CONFIG = {
+    series: [
+        {
+            title: 'Metropolis',
+            image: 'series-1.jpg',
+            year: '2024',
+            imageCount: '45 Images',
+            link: 'metropolis.html',
+            description: 'Urban architecture and geometry explored through minimalist composition.'
+        },
+        {
+            title: 'Shadows',
+            image: 'series-2.jpg',
+            year: '2023',
+            imageCount: '32 Images',
+            link: 'shadows.html',
+            description: 'A study of contrast, abstraction, and negative space.'
+        },
+        {
+            title: 'Solitude',
+            image: 'series-3.jpg',
+            year: '2023',
+            imageCount: '28 Images',
+            link: 'solitude.html',
+            description: 'Isolation within crowded urban environments.'
+        },
+        {
+            title: 'Nocturne',
+            image: 'series-4.jpg',
+            year: '2022–2024',
+            imageCount: '52 Images | Ongoing',
+            link: 'nocturne.html',
+            description: 'The city transformed by artificial light at night.'
         }
-        
-        /**
-         * Toggle mobile menu
-         */
-        function toggleMenu() {
-            const menu = document.getElementById('menu');
-            menu.classList.toggle('active');
-        }
-        
-        /**
-         * Close menu when clicking links
-         */
-        function setupMenuLinks() {
-            document.querySelectorAll('#menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    document.getElementById('menu').classList.remove('active');
-                });
-            });
-        }
-        
-        /**
-         * Initialize on page load
-         */
-        window.addEventListener('DOMContentLoaded', () => {
-            loadSeries();
-            setupMenuLinks();
-        });
-    </script>
-    
+    ]
+};
+
+function loadSeries() {
+    const grid = document.getElementById('seriesGrid');
+
+    CONFIG.series.forEach(series => {
+        const card = document.createElement('div');
+        card.className = 'series-card';
+
+        const imageLink = document.createElement('a');
+        imageLink.href = series.link;
+
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'series-image';
+
+        const img = document.createElement('img');
+        img.src = series.image;
+        img.alt = series.title;
+
+        imageDiv.appendChild(img);
+        imageLink.appendChild(imageDiv);
+
+        const info = document.createElement('div');
+        info.className = 'series-info';
+
+        info.innerHTML = `
+            <h2>${series.title}</h2>
+            <p class="series-meta">${series.year} | ${series.imageCount}</p>
+            <p>${series.description}</p>
+        `;
+
+        card.appendChild(imageLink);
+        card.appendChild(info);
+        grid.appendChild(card);
+    });
+}
+
+function toggleMenu() {
+    document.getElementById('menu').classList.toggle('active');
+}
+
+document.addEventListener('DOMContentLoaded', loadSeries);
+</script>
+
 </body>
 </html>
-```
