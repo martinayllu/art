@@ -1,51 +1,44 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Martin Cueva | Artist</title>
-    
+
     <style>
         /* ========================================
            GLOBAL STYLES
            Reset and base styles for the entire page
         ======================================== */
-        
-        /* Remove default margins and padding from all elements */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
-        /* Body styling - mimics Alan Schaller's black background aesthetic */
+
         body {
             font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
-            background-color: #000000; /* Pure black background */
-            color: #ffffff; /* White text for contrast */
+            background-color: #000000;
+            color: #ffffff;
             line-height: 1.6;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
         }
-        
+
         /* ========================================
            NAVIGATION BAR
-           Fixed top navigation that stays visible when scrolling
         ======================================== */
-        
         nav {
-            position: fixed; /* Stays at top when scrolling */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.98); /* Almost opaque black */
+            background-color: rgba(0, 0, 0, 0.98);
             padding: 25px 0;
-            z-index: 1000; /* Appears above all other content */
-            border-bottom: 1px solid #222; /* Subtle border */
-            backdrop-filter: blur(10px); /* Blur effect for modern browsers */
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+            backdrop-filter: blur(10px);
         }
-        
-        /* Navigation container - centers content and adds padding */
+
         nav .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -54,11 +47,10 @@
             align-items: center;
             padding: 0 40px;
         }
-        
+
         /* ========================================
            LOGO SECTION
         ======================================== */
-        
         .logo {
             font-size: 20px;
             font-weight: 400;
@@ -68,30 +60,26 @@
             text-transform: uppercase;
             transition: opacity 0.3s ease;
         }
-        
+
         .logo:hover {
-            opacity: 0.7; /* Fade effect on hover */
+            opacity: 0.7;
         }
-        
-        /* If using an image logo instead of text */
+
         .logo img {
             height: 50px;
             width: auto;
         }
-        
+
         /* ========================================
            NAVIGATION MENU
-           Desktop menu styling
         ======================================== */
-        
         nav ul {
             list-style: none;
             display: flex;
             gap: 40px;
             align-items: center;
         }
-        
-        /* Individual menu items */
+
         nav ul li a {
             color: #ffffff;
             text-decoration: none;
@@ -102,8 +90,7 @@
             transition: color 0.3s ease;
             position: relative;
         }
-        
-        /* Underline effect on hover */
+
         nav ul li a::after {
             content: '';
             position: absolute;
@@ -114,51 +101,45 @@
             background-color: #ffffff;
             transition: width 0.3s ease;
         }
-        
+
         nav ul li a:hover::after {
-            width: 100%; /* Underline expands on hover */
+            width: 100%;
         }
-        
+
         nav ul li a:hover {
-            color: #cccccc; /* Slightly gray on hover */
+            color: #cccccc;
         }
-        
+
         /* ========================================
            MOBILE HAMBURGER MENU
-           Three-line icon that appears on mobile devices
         ======================================== */
-        
         .menu-toggle {
-            display: none; /* Hidden on desktop */
+            display: none;
             flex-direction: column;
             cursor: pointer;
             gap: 6px;
             z-index: 1001;
         }
-        
-        /* Three horizontal lines */
+
         .menu-toggle span {
             width: 28px;
             height: 2px;
             background-color: #ffffff;
             transition: all 0.3s ease;
         }
-        
+
         /* ========================================
            HERO SECTION
-           Main title area at the top of the page
         ======================================== */
-        
         .hero {
-            margin-top: 120px; /* Space below fixed navigation */
+            margin-top: 120px;
             padding: 80px 40px;
             text-align: center;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
-        
-        /* Main heading */
+
         .hero h1 {
             font-size: 56px;
             font-weight: 200;
@@ -166,8 +147,7 @@
             margin-bottom: 30px;
             line-height: 1.2;
         }
-        
-        /* Subtitle under main heading */
+
         .hero .subtitle {
             font-size: 13px;
             color: #999999;
@@ -176,49 +156,47 @@
             font-weight: 300;
             line-height: 1.8;
         }
-        
+
         /* ========================================
            PHOTO GALLERY
-           Grid layout for displaying portfolio images
         ======================================== */
-        
         .gallery {
             max-width: 1400px;
             margin: 80px auto;
             padding: 0 40px;
             display: grid;
-            /* Responsive grid: automatically creates columns based on screen size */
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
         }
-        
-        /* Individual photo container */
+
+        /* Gallery item is now a link */
         .gallery-item {
             position: relative;
             overflow: hidden;
-            aspect-ratio: 3/2; /* Maintains consistent image proportions */
-            background-color: #111; /* Dark background while image loads */
+            aspect-ratio: 3/2;
+            background-color: #111;
             cursor: pointer;
-            border: 1px solid #1a1a1a; /* Subtle border */
+            border: 1px solid #1a1a1a;
+            display: block;
+            text-decoration: none;
+            color: inherit;
         }
-        
-        /* Gallery images */
+
         .gallery-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Crops image to fit without distortion */
+            object-fit: cover;
             display: block;
             transition: transform 0.5s ease, opacity 0.3s ease;
             opacity: 0.9;
         }
-        
-        /* Zoom and brighten effect on hover */
-        .gallery-item:hover img {
-            transform: scale(1.08); /* Smooth zoom effect */
+
+        .gallery-item:hover img,
+        .gallery-item:focus img {
+            transform: scale(1.08);
             opacity: 1;
         }
-        
-        /* Caption overlay that appears on hover */
+
         .gallery-item .caption {
             position: absolute;
             bottom: 0;
@@ -229,27 +207,29 @@
             color: #ffffff;
             opacity: 0;
             transition: opacity 0.4s ease;
-            pointer-events: none; /* Doesn't block clicks */
+            pointer-events: none;
         }
-        
-        /* Caption title */
+
         .gallery-item .caption p {
             font-size: 14px;
             letter-spacing: 2px;
             text-transform: uppercase;
             font-weight: 300;
         }
-        
-        /* Show caption on hover */
-        .gallery-item:hover .caption {
+
+        .gallery-item:hover .caption,
+        .gallery-item:focus .caption {
             opacity: 1;
         }
-        
+
+        .gallery-item:focus {
+            outline: 2px solid #ffffff;
+            outline-offset: 4px;
+        }
+
         /* ========================================
            FOOTER
-           Bottom section with copyright information
         ======================================== */
-        
         footer {
             text-align: center;
             padding: 60px 40px;
@@ -257,8 +237,7 @@
             margin-top: 100px;
             background-color: #000000;
         }
-        
-        /* Footer copyright text */
+
         footer p {
             font-size: 11px;
             color: #666666;
@@ -266,48 +245,42 @@
             text-transform: uppercase;
             font-weight: 300;
         }
-        
+
         /* ========================================
            RESPONSIVE DESIGN - TABLET
-           Styles for medium-sized screens (tablets)
         ======================================== */
-        
         @media (max-width: 1024px) {
             nav .container {
                 padding: 0 30px;
             }
-            
+
             .hero {
                 padding: 60px 30px;
             }
-            
+
             .hero h1 {
                 font-size: 42px;
             }
-            
+
             .gallery {
                 padding: 0 30px;
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                 gap: 20px;
             }
         }
-        
+
         /* ========================================
            RESPONSIVE DESIGN - MOBILE
-           Styles for small screens (phones)
         ======================================== */
-        
         @media (max-width: 768px) {
-            /* Navigation adjustments for mobile */
             nav {
                 padding: 20px 0;
             }
-            
+
             nav .container {
                 padding: 0 20px;
             }
-            
-            /* Hide desktop menu on mobile */
+
             nav ul {
                 display: none;
                 flex-direction: column;
@@ -321,53 +294,46 @@
                 gap: 30px;
                 justify-content: flex-start;
             }
-            
-            /* Show menu when hamburger is clicked */
+
             nav ul.active {
                 display: flex;
             }
-            
-            /* Menu items styling for mobile */
+
             nav ul li a {
                 font-size: 16px;
                 letter-spacing: 3px;
             }
-            
-            /* Show hamburger menu on mobile */
+
             .menu-toggle {
                 display: flex;
             }
-            
-            /* Hero section adjustments */
+
             .hero {
                 margin-top: 80px;
                 padding: 50px 20px;
             }
-            
+
             .hero h1 {
                 font-size: 28px;
                 letter-spacing: 2px;
             }
-            
+
             .hero .subtitle {
                 font-size: 11px;
                 letter-spacing: 2px;
             }
-            
-            /* Gallery adjustments - single column on mobile */
+
             .gallery {
                 padding: 0 20px;
-                grid-template-columns: 1fr; /* One image per row */
+                grid-template-columns: 1fr;
                 gap: 20px;
                 margin: 50px auto;
             }
-            
-            /* Adjust gallery item aspect ratio for mobile */
+
             .gallery-item {
-                aspect-ratio: 4/3; /* Slightly taller on mobile */
+                aspect-ratio: 4/3;
             }
-            
-            /* Footer adjustments */
+
             footer {
                 padding: 40px 20px;
                 margin-top: 60px;
@@ -376,27 +342,26 @@
     </style>
 </head>
 <body>
-    
+
     <!-- ========================================
          NAVIGATION BAR
     ======================================== -->
     <nav>
         <div class="container">
-            
+
             <!-- LOGO -->
-            <!-- UPDATE: Replace "YOUR NAME" with your name/brand -->
-            <a href="#" class="logo">Martin Cueva</a>
-            
+            <a href="index.html" class="logo">Martin Cueva</a>
+
             <!-- OPTIONAL: Use image logo instead -->
-            <!-- <a href="#" class="logo"><img src="" id="logoImage" alt="Your Name Logo"></a> -->
-            
+            <!-- <a href="index.html" class="logo"><img src="" id="logoImage" alt="Martin Cueva Logo"></a> -->
+
             <!-- Mobile hamburger menu button -->
             <div class="menu-toggle" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            
+
             <!-- Navigation Menu -->
             <ul id="menu">
                 <li><a href="index.html">Home</a></li>
@@ -405,99 +370,77 @@
             </ul>
         </div>
     </nav>
-    
+
     <!-- ========================================
-         HERO SECTION - Main Title Area
+         HERO SECTION
     ======================================== -->
     <section class="hero">
         <h1>- Visual Art and Music -</h1>
         <p class="subtitle">Fine Art Photography - Drawing and Painting - Music Interpretation</p>
     </section>
-    
+
     <!-- ========================================
          PHOTO GALLERY
-         Images will be loaded dynamically from JavaScript
     ======================================== -->
     <section class="gallery" id="gallery">
         <!-- Gallery items will be inserted here by JavaScript -->
     </section>
-    
+
     <!-- ========================================
-         FOOTER - Copyright Section
+         FOOTER
     ======================================== -->
     <footer>
-        <!-- UPDATE: Replace "YOUR NAME" with your actual name -->
         <p>© Martin Cueva - Copyright 2020</p>
     </footer>
-    
+
     <!-- ========================================
-         JAVASCRIPT - Interactive Functionality
+         JAVASCRIPT
     ======================================== -->
     <script>
-        /* ========================================================================
-           📸 IMAGE CONFIGURATION - UPDATE ALL YOUR IMAGE FILENAMES HERE
-           ========================================================================
-           This is the ONLY place you need to update image filenames!
-           All images below will be automatically loaded into the gallery.
-        ======================================================================== */
-        
         const CONFIG = {
-            // LOGO IMAGE (optional - only if using image logo instead of text)
-            // Remove the comment marks (//) below if you want to use an image logo
+            // Optional logo image
             // logoImage: 'logo.png',
-            
-            // GALLERY PHOTOS
-            // UPDATE: Replace these filenames with your actual photo filenames
-            // You can add or remove photos from this list
+
             galleryPhotos: [
                 {
-                    image: 'UrbanCover.jpg',        // Image filename
-                    title: 'Nature and Urban Photography',      // Caption that appears on hover
-                    alt: 'Photography Portfolio Nature&Urban'  // Alt text for accessibility
+                    image: 'UrbanCover.jpg',
+                    title: 'Nature and Urban Photography',
+                    alt: 'Photography Portfolio Nature and Urban',
+                    link: 'Gallery1.html'
                 },
                 {
                     image: 'AssignmentCover.jpg',
                     title: 'Assignments Photography',
-                    alt: 'Photography Portfolio Assigments'
+                    alt: 'Photography Portfolio Assignments',
+                    link: 'Gallery2.html'
                 },
                 {
                     image: 'BooksCover.jpg',
                     title: 'Books',
-                    alt: 'Published Books'
+                    alt: 'Published Books',
+                    link: 'Gallery3.html'
                 },
                 {
                     image: 'DrawingsCover.jpg',
                     title: 'Drawings',
-                    alt: 'Drawings Portfolio'
+                    alt: 'Drawings Portfolio',
+                    link: 'Gallery4.html'
                 },
                 {
                     image: 'PaintingCover.jpg',
                     title: 'Paintings',
-                    alt: 'Painting Portfolio'
+                    alt: 'Painting Portfolio',
+                    link: 'Gallery5.html'
                 },
                 {
                     image: 'writingsCover.jpg',
                     title: 'Writings',
-                    alt: 'Writings Portfolio'
+                    alt: 'Writings Portfolio',
+                    link: 'Gallery6.html'
                 }
-                
-                // TO ADD MORE PHOTOS: Copy the block above and paste here
-                // Example:
-                // ,
-                // {
-                //     image: 'photo-7.jpg',
-                //     title: 'New Photo Title',
-                //     alt: 'Photography Portfolio Image 7'
-                // }
             ]
         };
-        
-        /* ========================================================================
-           DO NOT EDIT BELOW THIS LINE (unless you know what you're doing)
-           ========================================================================
-           The code below automatically loads images from the CONFIG object above
-        ======================================================================== */
-        
+
         /**
          * Load logo image if configured
          */
@@ -509,40 +452,47 @@
                 }
             }
         }
-        
+
         /**
          * Dynamically create and load gallery images from CONFIG
          */
         function loadGallery() {
             const gallery = document.getElementById('gallery');
-            
-            // Loop through each photo in the CONFIG
-            CONFIG.galleryPhotos.forEach(photo => {
-                // Create gallery item container
-                const galleryItem = document.createElement('div');
+            gallery.innerHTML = '';
+
+            CONFIG.galleryPhotos.forEach((photo, index) => {
+                const pageLink = photo.link || `Gallery${index + 1}.html`;
+
+                // Create gallery item as a clickable link
+                const galleryItem = document.createElement('a');
                 galleryItem.className = 'gallery-item';
-                
+                galleryItem.href = pageLink;
+                galleryItem.setAttribute('aria-label', `Open ${photo.title}`);
+
                 // Create image element
                 const img = document.createElement('img');
                 img.src = photo.image;
                 img.alt = photo.alt;
-                
+                img.loading = 'lazy';
+                img.decoding = 'async';
+
                 // Create caption element
                 const caption = document.createElement('div');
                 caption.className = 'caption';
+
                 const captionText = document.createElement('p');
                 captionText.textContent = photo.title;
                 caption.appendChild(captionText);
-                
+
                 // Assemble gallery item
                 galleryItem.appendChild(img);
                 galleryItem.appendChild(caption);
-                
+
                 // Add to gallery
                 gallery.appendChild(galleryItem);
             });
         }
-        
+
         /**
          * Toggle mobile menu open/closed
          */
@@ -550,7 +500,7 @@
             const menu = document.getElementById('menu');
             menu.classList.toggle('active');
         }
-        
+
         /**
          * Close mobile menu when clicking any menu link
          */
@@ -561,7 +511,7 @@
                 });
             });
         }
-        
+
         /**
          * Initialize everything when page loads
          */
@@ -571,8 +521,6 @@
             setupMenuLinks();
         });
     </script>
-    
+
 </body>
 </html>
-```
-
