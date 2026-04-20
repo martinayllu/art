@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery 3 | Martin Cueva</title>
+
+  <style>
+    /* ========================================
+       GLOBAL STYLES (matches your series.html vibe)
+    ======================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ========================================
+       NAVIGATION (same structure as your page)
+    ======================================== */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background-color: rgba(0,0,0,0.98);
+      padding: 25px 0;
+      z-index: 1000;
+      border-bottom: 1px solid #222;
+      backdrop-filter: blur(10px);
+    }
+
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-transform: uppercase;
+      transition: opacity 0.3s ease;
+    }
+    .logo:hover { opacity: 0.7; }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    nav ul li a {
+      color: #ffffff;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 300;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    nav ul li a.active { color: #cccccc; }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: #ffffff;
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after,
+    nav ul li a.active::after {
+      width: 100%;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 6px;
+    }
+
+    .menu-toggle span {
+      width: 28px;
+      height: 2px;
+      background-color: #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    /* ========================================
+       SERIES HEADER
+    ======================================== */
+    .series-header {
+      margin-top: 120px;
+      padding: 80px 40px 30px;
+      text-align: center;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .series-header h1 {
+      font-size: 56px;
+      font-weight: 200;
+      letter-spacing: 4px;
+      margin-bottom: 18px;
+    }
+
+    .series-submeta {
+      font-size: 12px;
+      color: #666;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .series-header p {
+      font-size: 16px;
+      color: #999;
+      letter-spacing: 2px;
+      line-height: 1.8;
+    }
+
+    .back-row {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #999;
+      transition: opacity 0.2s ease;
+    }
+    .back-link:hover { opacity: 0.7; }
+
+    /* ========================================
+       GALLERY — "Selected Work"-style behavior:
+       clean, tall imagery, minimal chrome, masonry flow
+    ======================================== */
+    .gallery-wrap {
+      max-width: 1400px;
+      margin: 60px auto 0;
+      padding: 0 40px;
+    }
+
+    /* CSS columns = simple masonry-like flow */
+    .masonry {
+      column-count: 2;
+      column-gap: 60px;
+    }
+
+    .shot {
+      break-inside: avoid;
+      margin: 0 0 60px;
+      cursor: zoom-in;
+    }
+
+    .shot img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #111;
+      border: 1px solid #111;
+      opacity: 0.92;
+      transition: opacity 0.25s ease, transform 0.35s ease;
+      will-change: transform;
+    }
+
+    .shot:hover img {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+
+    /* Optional: very subtle caption style (off by default) */
+    .caption {
+      display: none; /* set to block if you want captions */
+      margin-top: 10px;
+      font-size: 12px;
+      color: #777;
+      letter-spacing: 1px;
+    }
+
+    /* ========================================
+       LIGHTBOX
+    ======================================== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 40px 20px;
+    }
+    .lightbox.active { display: flex; }
+
+    .lightbox-inner {
+      width: min(1100px, 95vw);
+      height: min(85vh, 900px);
+      display: grid;
+      grid-template-columns: 60px 1fr 60px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lb-btn {
+      height: 60px;
+      width: 60px;
+      border: 1px solid #222;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+      font-size: 20px;
+      transition: background 0.2s ease, opacity 0.2s ease;
+      display: grid;
+      place-items: center;
+      user-select: none;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,0.06); }
+
+    .lb-stage {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      border: 1px solid #111;
+      background: rgba(0,0,0,0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .lb-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .lb-top {
+      position: fixed;
+      top: 22px;
+      right: 22px;
+      display: flex;
+      gap: 10px;
+      z-index: 2100;
+    }
+
+    .lb-close {
+      border: 1px solid #222;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      transition: background 0.2s ease, opacity 0.2s ease;
+    }
+    .lb-close:hover { background: rgba(255,255,255,0.06); }
+
+    /* ========================================
+       FOOTER
+    ======================================== */
+    footer {
+      text-align: center;
+      padding: 60px 40px;
+      border-top: 1px solid #222;
+      margin-top: 100px;
+    }
+
+    footer p {
+      font-size: 11px;
+      color: #666666;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 1024px) {
+      .masonry { column-gap: 40px; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 0; }
+      nav .container { padding: 0 20px; }
+
+      nav ul {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.98);
+        padding: 100px 40px;
+        gap: 30px;
+        justify-content: flex-start;
+      }
+      nav ul.active { display: flex; }
+      .menu-toggle { display: flex; }
+
+      .series-header {
+        margin-top: 80px;
+        padding: 50px 20px 20px;
+      }
+      .series-header h1 { font-size: 32px; letter-spacing: 2px; }
+
+      .back-row { padding: 0 20px; }
+      .gallery-wrap { padding: 0 20px; }
+
+      .masonry { column-count: 1; column-gap: 0; }
+      .shot { margin-bottom: 40px; }
+
+      .lightbox-inner {
+        grid-template-columns: 46px 1fr 46px;
+      }
+      .lb-btn { width: 46px; height: 46px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ========================================
+       NAVIGATION
+  ======================================== -->
+  <nav>
+    <div class="container">
+      <a href="index.html" class="logo">MARTIN CUEVA</a>
+
+      <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+
+      <ul id="menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a class="active" href="series.html">Series</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ========================================
+       SERIES HEADER
+  ======================================== -->
+  <section class="series-header" id="seriesHeader">
+    <!-- Filled by JS -->
+  </section>
+
+  <div class="back-row">
+    <a class="back-link" href="series.html">← Back to Series</a>
+  </div>
+
+  <!-- ========================================
+       GALLERY
+  ======================================== -->
+  <section class="gallery-wrap">
+    <div class="masonry" id="gallery"></div>
+  </section>
+
+  <!-- ========================================
+       LIGHTBOX
+  ======================================== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lb-top">
+      <button class="lb-close" id="lbClose" type="button">Close</button>
+    </div>
+
+    <div class="lightbox-inner" role="dialog" aria-modal="true" aria-label="Image viewer">
+      <button class="lb-btn" id="lbPrev" type="button" aria-label="Previous image">‹</button>
+
+      <div class="lb-stage" id="lbStage">
+        <img id="lbImg" alt="" />
+      </div>
+
+      <button class="lb-btn" id="lbNext" type="button" aria-label="Next image">›</button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       FOOTER
+  ======================================== -->
+  <footer>
+    <p>© MARTIN CUEVA - DESIGNED BY MARTIN CUEVA</p>
+  </footer>
+
+  <!-- ========================================
+       JAVASCRIPT
+  ======================================== -->
+  <script>
+    /* ========================================================================
+       SERIES CONFIG — EDIT THIS ONLY
+       ======================================================================== */
+    const SERIES = {
+      title: "Gallery 3",
+      year: "2026",
+      imageCount: "20 Images",
+      description:
+        "An exploration of Gallery 3.",
+      images: [
+        "Gallery3_1.jpg",
+        "Gallery3_2.jpg",
+        "Gallery3_3.jpg",
+        "Gallery3_4.jpg",
+        "Gallery3_5.jpg",
+        "Gallery3_6.jpg",
+        "Gallery3_7.jpg",
+        "Gallery3_8.jpg",
+        "Gallery3_9.jpg",
+        "Gallery3_10.jpg",
+        "Gallery3_11.jpg",
+        "Gallery3_12.jpg",
+        "Gallery3_13.jpg",
+        "Gallery3_14.jpg",
+        "Gallery3_15.jpg",
+        "Gallery3_16.jpg",
+        "Gallery3_17.jpg",
+        "Gallery3_18.jpg",
+        "Gallery3_19.jpg",
+        "Gallery3_20.jpg"
+      ]
+    };
+
+    /* ========================================================================
+       DO NOT EDIT BELOW THIS LINE
+       ======================================================================== */
+
+    const headerEl = document.getElementById("seriesHeader");
+    const galleryEl = document.getElementById("gallery");
+
+    const lightboxEl = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbClose = document.getElementById("lbClose");
+    const lbPrev = document.getElementById("lbPrev");
+    const lbNext = document.getElementById("lbNext");
+
+    let currentIndex = 0;
+
+    function renderHeader() {
+      headerEl.innerHTML = `
+        <h1>${SERIES.title}</h1>
+        <div class="series-submeta">${SERIES.year} | ${SERIES.imageCount}</div>
+        <p>${SERIES.description}</p>
+      `;
+    }
+
+    function renderGallery() {
+      const frag = document.createDocumentFragment();
+
+      SERIES.images.forEach((src, idx) => {
+        const shot = document.createElement("div");
+        shot.className = "shot";
+        shot.setAttribute("data-index", idx);
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `${SERIES.title} ${String(idx + 1).padStart(2, "0")}`;
+        img.loading = "lazy";
+
+        shot.appendChild(img);
+
+        // Click to open lightbox
+        shot.addEventListener("click", () => openLightbox(idx));
+
+        frag.appendChild(shot);
+      });
+
+      galleryEl.appendChild(frag);
+    }
+
+    function openLightbox(idx) {
+      currentIndex = idx;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+
+      lightboxEl.classList.add("active");
+      lightboxEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      lightboxEl.classList.remove("active");
+      lightboxEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      lbImg.src = "";
+    }
+
+    function showPrev() {
+      currentIndex = (currentIndex - 1 + SERIES.images.length) % SERIES.images.length;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+    }
+
+    function showNext() {
+      currentIndex = (currentIndex + 1) % SERIES.images.length;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+    }
+
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("active");
+    }
+
+    // Close menu when clicking a link (mobile)
+    function setupMenuLinks() {
+      document.querySelectorAll("#menu a").forEach(link => {
+        link.addEventListener("click", () => {
+          document.getElementById("menu").classList.remove("active");
+        });
+      });
+    }
+
+    // Lightbox events
+    lbClose.addEventListener("click", closeLightbox);
+    lbPrev.addEventListener("click", showPrev);
+    lbNext.addEventListener("click", showNext);
+
+    // Click outside the image area closes
+    lightboxEl.addEventListener("click", (e) => {
+      if (e.target === lightboxEl) closeLightbox();
+    });
+
+    // Keyboard controls
+    window.addEventListener("keydown", (e) => {
+      if (!lightboxEl.classList.contains("active")) return;
+
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") showPrev();
+      if (e.key === "ArrowRight") showNext();
+    });
+
+    // Allow Enter key on mobile menu toggle (accessibility)
+    document.querySelector(".menu-toggle").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") toggleMenu();
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderHeader();
+      renderGallery();
+      setupMenuLinks();
+    });
+  </script>
+</body>
+</html>
