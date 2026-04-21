@@ -21,7 +21,7 @@
     a { color: inherit; text-decoration: none; }
 
     /* ========================================
-       NAVIGATION (same structure as your page)
+       NAVIGATION
     ======================================== */
     nav {
       position: fixed;
@@ -154,8 +154,7 @@
     .back-link:hover { opacity: 0.7; }
 
     /* ========================================
-       GALLERY — "Selected Work"-style behavior:
-       clean, tall imagery, minimal chrome, masonry flow
+       GALLERY
     ======================================== */
     .gallery-wrap {
       max-width: 1400px;
@@ -163,7 +162,6 @@
       padding: 0 40px;
     }
 
-    /* CSS columns = simple masonry-like flow */
     .masonry {
       column-count: 2;
       column-gap: 60px;
@@ -172,7 +170,7 @@
     .shot {
       break-inside: avoid;
       margin: 0 0 60px;
-      cursor: zoom-in;
+      cursor: pointer;
     }
 
     .shot img {
@@ -191,9 +189,8 @@
       transform: translateY(-2px);
     }
 
-    /* Optional: very subtle caption style (off by default) */
     .caption {
-      display: none; /* set to block if you want captions */
+      display: none;
       margin-top: 10px;
       font-size: 12px;
       color: #777;
@@ -414,31 +411,32 @@
       title: "Writings",
       year: "Published in Medium",
       imageCount: "Spanish Language",
-      description:
-        "Polimatía.",
+      description: "Polimatía.",
       images: [
-        "Gallery6_1.jpg",
-        "Gallery6_2.jpg",
-        "Gallery6_3.jpg"
-        
-         /* ,
-        "Gallery6_4.jpg",
-        "Gallery6_5.jpg",
-        "Gallery6_6.jpg",
-        "Gallery6_7.jpg",
-        "Gallery6_8.jpg",
-        "Gallery6_9.jpg",
-        "Gallery6_10.jpg",
-        "Gallery6_11.jpg",
-        "Gallery6_12.jpg",
-        "Gallery6_13.jpg",
-        "Gallery6_14.jpg",
-        "Gallery6_15.jpg",
-        "Gallery6_16.jpg",
-        "Gallery6_17.jpg",
-        "Gallery6_18.jpg",
-        "Gallery6_19.jpg",
-        "Gallery6_20.jpg" */ 
+        {
+          src: "Gallery6_1.jpg",
+          link: "https://medium.com/@ocueva/un-peque%C3%B1o-hombre-en-un-momento-gigante-09f3a6a539b4?postPublishedType=repub"
+        },
+        {
+          src: "Gallery6_2.jpg",
+          link: "https://xx.com"
+        },
+        {
+          src: "Gallery6_3.jpg",
+          link: "https://xx.com"
+        }
+
+        /*
+        ,
+        {
+          src: "Gallery6_4.jpg",
+          link: "https://xx.com"
+        },
+        {
+          src: "Gallery6_5.jpg",
+          link: "https://xx.com"
+        }
+        */
       ]
     };
 
@@ -468,20 +466,26 @@
     function renderGallery() {
       const frag = document.createDocumentFragment();
 
-      SERIES.images.forEach((src, idx) => {
+      SERIES.images.forEach((item, idx) => {
         const shot = document.createElement("div");
         shot.className = "shot";
         shot.setAttribute("data-index", idx);
 
         const img = document.createElement("img");
-        img.src = src;
+        img.src = item.src;
         img.alt = `${SERIES.title} ${String(idx + 1).padStart(2, "0")}`;
         img.loading = "lazy";
 
         shot.appendChild(img);
 
-        // Click to open lightbox
-        shot.addEventListener("click", () => openLightbox(idx));
+        // If image has external link, open it. Otherwise open lightbox.
+        shot.addEventListener("click", () => {
+          if (item.link) {
+            window.open(item.link, "_blank", "noopener,noreferrer");
+          } else {
+            openLightbox(idx);
+          }
+        });
 
         frag.appendChild(shot);
       });
@@ -491,7 +495,7 @@
 
     function openLightbox(idx) {
       currentIndex = idx;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
 
       lightboxEl.classList.add("active");
@@ -508,13 +512,13 @@
 
     function showPrev() {
       currentIndex = (currentIndex - 1 + SERIES.images.length) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
     }
 
     function showNext() {
       currentIndex = (currentIndex + 1) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
     }
 
@@ -522,7 +526,6 @@
       document.getElementById("menu").classList.toggle("active");
     }
 
-    // Close menu when clicking a link (mobile)
     function setupMenuLinks() {
       document.querySelectorAll("#menu a").forEach(link => {
         link.addEventListener("click", () => {
@@ -550,7 +553,7 @@
       if (e.key === "ArrowRight") showNext();
     });
 
-    // Allow Enter key on mobile menu toggle (accessibility)
+    // Allow Enter / Space key on mobile menu toggle
     document.querySelector(".menu-toggle").addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") toggleMenu();
     });
