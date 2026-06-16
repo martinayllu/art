@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FX Stock Market Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #121212;
+  --sf: #1e1e1e;
+  --bd: #333;
+  --tx: #e0e0e0;
+  --tx2: #aaa;
+  --ac: #4fc3f7;
+  --gn: #66bb6a;
+  --rd: #ef5350;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+h1 { color: var(--ac); margin-bottom: 4px; font-size: 24px; }
+.subtitle {
+  color: var(--tx2);
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.range-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+.range-label {
+  color: var(--tx2);
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.range-btn {
+  color: var(--tx2);
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .2s;
+  user-select: none;
+  display: inline-block;
+  text-align: center;
+}
+.range-btn:hover {
+  color: #fff;
+  border-color: var(--ac);
+  background: #1a2a3a;
+}
+.range-btn.active {
+  color: #fff;
+  background: var(--ac);
+  border-color: var(--ac);
+  font-weight: 700;
+}
+.section-title {
+  color: var(--ac);
+  font-size: 18px;
+  margin: 28px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--bd);
+  grid-column: 1 / -1;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+}
+.card {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 20px;
+}
+.card h2 {
+  color: var(--ac);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.card.loading h2::after {
+  content: " loading...";
+  font-size: 11px;
+  color: var(--tx2);
+  animation: pulse 1.5s infinite;
+}
+.card.error { border-color: var(--rd); }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+.current-rate {
+  color: var(--tx);
+  font-size: 13px;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.rate-value {
+  font-family: 'Cascadia Code', 'Fira Code',
+    Consolas, monospace;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+}
+.pos { color: var(--gn); font-weight: 600; }
+.neg { color: var(--rd); font-weight: 600; }
+.stats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.stat {
+  background: #1a1a2e;
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 6px 10px;
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+}
+.stat-label {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--tx2);
+  margin-bottom: 2px;
+}
+.stat-value {
+  font-family: 'Cascadia Code', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tx);
+}
+canvas { margin-top: 6px; }
+.footer {
+  text-align: center;
+  color: var(--tx2);
+  font-size: 11px;
+  margin-top: 16px;
+  grid-column: 1 / -1;
+}
+.footer a {
+  color: var(--ac);
+  text-decoration: none;
+}
+.status-bar {
+  color: var(--tx2);
+  font-size: 12px;
+  padding: 6px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-bar .spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--bd);
+  border-top-color: var(--ac);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<h1>&#128178; FX, Stock &amp; Market Dashboard</h1>
+<p class="subtitle" id="genTime"></p>
+<div class="status-bar" id="statusBar">
+  <span class="spinner"></span>
+  <span id="statusText">Loading data...</span>
+</div>
+
+<div class="range-bar">
+  <span class="range-label">Time Range:</span>
+  <a class="range-btn" data-range="1M"
+    onclick="setRange('1M')">1M</a>
+  <a class="range-btn active" data-range="3M"
+    onclick="setRange('3M')">3M</a>
+  <a class="range-btn" data-range="6M"
+    onclick="setRange('6M')">6M</a>
+  <a class="range-btn" data-range="YTD"
+    onclick="setRange('YTD')">YTD</a>
+  <a class="range-btn" data-range="1Y"
+    onclick="setRange('1Y')">1Y</a>
+  <a class="range-btn" data-range="5Y"
+    onclick="setRange('5Y')">5Y</a>
+  <a class="range-btn" data-range="10Y"
+    onclick="setRange('10Y')">10Y</a>
+  <a class="range-btn" data-range="20Y"
+    onclick="setRange('20Y')">20Y</a>
+</div>
+
+<div class="grid" id="chartGrid"></div>
+
+<script>
+/* ======= CONFIG ======= */
+var CHARTS_CONFIG = [
+  {
+    section: "&#127760; Exchange Rates",
+    source: "fx",
+    base: "USD",
+    quote: "COP",
+    label: "USD / COP &#8212; US Dollar to Colombian Peso",
+    unit: "COP"
+  },
+  {
+    source: "fx",
+    base: "USD",
+    quote: "PEN",
+    label: "USD / PEN &#8212; US Dollar to Peruvian Sol",
+    unit: "PEN"
+  },
+  {
+    source: "fx",
+    base: "USD",
+    quote: "JPY",
+    label: "USD / JPY &#8212; US Dollar to Japanese Yen",
+    unit: "JPY"
+  },
+  {
+    source: "fx",
+    base: "GBP",
+    quote: "EUR",
+    label: "GBP / EUR &#8212; British Pound to Euro",
+    unit: "EUR"
+  },
+  {
+    section: "&#128202; Market Indices &amp; Bonds",
+    source: "yahoo",
+    ticker: "^GSPC",
+    label: "S&amp;P 500 Index",
+    unit: "pts"
+  },
+  {
+    source: "yahoo",
+    ticker: "^IXIC",
+    label: "NASDAQ Composite",
+    unit: "pts"
+  },
+  {
+    source: "yahoo",
+    ticker: "^VIX",
+    label: "CBOE Volatility Index (VIX)",
+    unit: "pts"
+  },
+  {
+    source: "yahoo",
+    ticker: "^TNX",
+    label: "US 10-Year Treasury Yield",
+    unit: "%"
+  },
+  {
+    section: "&#128200; Lima Stock Prices",
+    source: "yahoo",
+    ticker: "VOLCABC1.LM",
+    label: "VOLCABC1.LM &#8212; Volcan Minera Class B",
+    unit: "PEN"
+  },
+  {
+    source: "yahoo",
+    ticker: "CORAREI1.LM",
+    label: "CORAREI1.LM &#8212; Corp. Aceros Arequipa",
+    unit: "PEN"
+  },
+  {
+    section: "&#129302; AI &amp; Robotics ETFs",
+    source: "yahoo",
+    ticker: "QTUM",
+    label: "QTUM &#8212; Defiance Quantum ETF",
+    unit: "USD"
+  },
+  {
+    source: "yahoo",
+    ticker: "ROBO",
+    label: "ROBO &#8212; ROBO Global Robotics ETF",
+    unit: "USD"
+  }
+];
+
+var COLORS = [
+  "#4fc3f7", "#66bb6a", "#ffa726", "#ec407a",
+  "#ab47bc", "#26c6da", "#ef5350", "#fdd835",
+  "#78909c", "#7e57c2", "#29b6f6", "#9ccc65"
+];
+
+var rangeLabels = {
+  "1M": "1-Mo",
+  "3M": "3-Mo",
+  "6M": "6-Mo",
+  "YTD": "YTD",
+  "1Y": "1-Yr",
+  "5Y": "5-Yr",
+  "10Y": "10-Yr",
+  "20Y": "20-Yr"
+};
+
+var allChartData = [];
+var chartInstances = [];
+var activeRange = "3M";
+var YAHOO_MONTHS = 240;
+
+/* ======= HELPERS ======= */
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+function dateStr(d) {
+  return d.getFullYear() + "-" +
+    pad2(d.getMonth() + 1) + "-" +
+    pad2(d.getDate());
+}
+
+function fmtRate(v) {
+  if (v < 10) return v.toFixed(4);
+  return v.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function getCutoffStr(range) {
+  var now = new Date();
+  var y = now.getFullYear();
+  var m = now.getMonth();
+  var d = now.getDate();
+  switch (range) {
+    case "1M": m -= 1; break;
+    case "3M": m -= 3; break;
+    case "6M": m -= 6; break;
+    case "YTD": m = 0; d = 1; break;
+    case "1Y": y -= 1; break;
+    case "5Y": y -= 5; break;
+    case "10Y": y -= 10; break;
+    case "20Y": y -= 20; break;
+  }
+  return dateStr(new Date(y, m, d));
+}
+
+function setStatus(msg, done) {
+  var el = document.getElementById("statusText");
+  el.textContent = msg;
+  if (done) {
+    var bar = document.getElementById("statusBar");
+    bar.innerHTML =
+      '<span style="color:var(--gn)">&#10003;</span>' +
+      ' <span id="statusText">' + msg + '</span>';
+  }
+}
+
+/* ======= FETCH FX ======= */
+async function fetchFX(base, quote) {
+  var now = new Date();
+  var from = new Date(now);
+  from.setFullYear(from.getFullYear() - 20);
+  var url = "https://api.frankfurter.dev/v2/rates" +
+    "?base=" + base +
+    "&quotes=" + quote +
+    "&from=" + dateStr(from) +
+    "&to=" + dateStr(now);
+  var resp = await fetch(url);
+  var data = await resp.json();
+  var dates = [];
+  var rates = [];
+  data.forEach(function(e) {
+    dates.push(e.date);
+    rates.push(e.rate);
+  });
+  return { dates: dates, rates: rates };
+}
+
+/* ======= FETCH YAHOO ======= */
+async function fetchYahoo(ticker) {
+  var now = Math.floor(Date.now() / 1000);
+  var from = now - YAHOO_MONTHS * 31 * 86400;
+  var yUrl =
+    "https://query1.finance.yahoo.com" +
+    "/v8/finance/chart/" +
+    encodeURIComponent(ticker) +
+    "?period1=" + from +
+    "&period2=" + now +
+    "&interval=1d" +
+    "&includePrePost=false&events=";
+  var urls = [
+    yUrl,
+    "https://corsproxy.io/?" +
+      encodeURIComponent(yUrl),
+    "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent(yUrl)
+  ];
+  var lastErr;
+  for (var k = 0; k < urls.length; k++) {
+    try {
+      var resp = await fetch(urls[k], {
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!resp.ok) continue;
+      var data = await resp.json();
+      var result = data.chart.result[0];
+      var ts = result.timestamp;
+      var closes = result.indicators.quote[0].close;
+      var dates = [];
+      var rates = [];
+      for (var j = 0; j < ts.length; j++) {
+        if (closes[j] !== null) {
+          var dt = new Date(ts[j] * 1000);
+          dates.push(dateStr(dt));
+          rates.push(
+            Math.round(closes[j] * 10000) / 10000
+          );
+        }
+      }
+      return { dates: dates, rates: rates };
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("Failed: " + ticker);
+}
+
+/* ======= CREATE CHART ======= */
+function createChart(idx, item) {
+  var ctx = document.getElementById("chart_" + idx);
+  return new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: item.shortLabel,
+        data: [],
+        borderColor: item.color,
+        backgroundColor: item.color + "22",
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHitRadius: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      interaction: {
+        intersect: false,
+        mode: "index"
+      },
+      plugins: {
+        title: { display: false },
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(c) {
+              return item.shortLabel + ": " +
+                fmtRate(c.parsed.y) + " " +
+                item.unit;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#aaa",
+            maxTicksLimit: 12,
+            font: { size: 11 }
+          },
+          grid: { color: "#333" }
+        },
+        y: {
+          ticks: {
+            color: "#aaa",
+            font: { size: 11 },
+            callback: function(v) {
+              if (v < 10) return v.toFixed(4);
+              return v.toLocaleString();
+            }
+          },
+          grid: { color: "#333" }
+        }
+      }
+    }
+  });
+}
+
+/* ======= SET RANGE ======= */
+function setRange(range) {
+  activeRange = range;
+  var btns = document.querySelectorAll(".range-btn");
+  btns.forEach(function(b) {
+    b.classList.remove("active");
+  });
+  var sel = document.querySelector(
+    '[data-range="' + range + '"]'
+  );
+  if (sel) sel.classList.add("active");
+  var cutoffStr = getCutoffStr(range);
+  var label = rangeLabels[range] || range;
+
+  allChartData.forEach(function(item, i) {
+    if (!item || !item.dates) return;
+    if (!chartInstances[i]) return;
+    var dates = [];
+    var rates = [];
+    for (var j = 0; j < item.dates.length; j++) {
+      if (item.dates[j] >= cutoffStr) {
+        dates.push(item.dates[j]);
+        rates.push(item.rates[j]);
+      }
+    }
+    if (dates.length === 0) {
+      dates = item.dates.slice();
+      rates = item.rates.slice();
+    }
+
+    chartInstances[i].data.labels = dates;
+    chartInstances[i].data.datasets[0].data = rates;
+    chartInstances[i].update("none");
+
+    var mn = Math.min.apply(null, rates);
+    var mx = Math.max.apply(null, rates);
+    var sm = 0;
+    for (var k = 0; k < rates.length; k++) {
+      sm += rates[k];
+    }
+    var avg = sm / rates.length;
+    var last = rates[rates.length - 1];
+    var first = rates[0];
+    var change = ((last - first) / first) * 100;
+
+    document.getElementById("min_" + i)
+      .textContent = fmtRate(mn);
+    document.getElementById("max_" + i)
+      .textContent = fmtRate(mx);
+    document.getElementById("avg_" + i)
+      .textContent = fmtRate(avg);
+    document.getElementById("min_lbl_" + i)
+      .textContent = label + " Low";
+    document.getElementById("max_lbl_" + i)
+      .textContent = label + " High";
+    document.getElementById("avg_lbl_" + i)
+      .textContent = label + " Avg";
+
+    var absC = Math.abs(change).toFixed(2);
+    var arrow = change >= 0
+      ? "&#9650;" : "&#9660;";
+    var cls = change >= 0 ? "pos" : "neg";
+    document.getElementById("change_" + i)
+      .innerHTML = '<span class="' + cls +
+      '"> ' + arrow + " " + absC +
+      "% (" + label + ")</span>";
+
+    document.getElementById("rate_" + i)
+      .textContent = fmtRate(last) + " " +
+      item.unit;
+    document.getElementById("date_" + i)
+      .textContent = dates[dates.length - 1];
+  });
+}
+
+/* ======= BUILD CARDS ======= */
+function buildCards() {
+  var grid = document.getElementById("chartGrid");
+  var h = "";
+  CHARTS_CONFIG.forEach(function(cfg, i) {
+    if (cfg.section) {
+      h += '<h3 class="section-title">' +
+        cfg.section + '</h3>';
+    }
+    h += '<div class="card loading" id="card_' +
+      i + '">' +
+      '<h2>' + cfg.label + '</h2>' +
+      '<p class="current-rate">' +
+      'As of <strong id="date_' + i +
+      '">loading...</strong>: ' +
+      '<span class="rate-value" id="rate_' +
+      i + '">&mdash;</span> ' +
+      '<span id="change_' + i +
+      '"></span></p>' +
+      '<div class="stats-row">' +
+      '<div class="stat">' +
+      '<span class="stat-label" id="min_lbl_' +
+      i + '">Low</span>' +
+      '<span class="stat-value" id="min_' +
+      i + '">&mdash;</span></div>' +
+      '<div class="stat">' +
+      '<span class="stat-label" id="max_lbl_' +
+      i + '">High</span>' +
+      '<span class="stat-value" id="max_' +
+      i + '">&mdash;</span></div>' +
+      '<div class="stat">' +
+      '<span class="stat-label" id="avg_lbl_' +
+      i + '">Avg</span>' +
+      '<span class="stat-value" id="avg_' +
+      i + '">&mdash;</span></div>' +
+      '</div>' +
+      '<canvas id="chart_' + i +
+      '" height="200"></canvas></div>';
+  });
+  h += '<p class="footer">' +
+    'FX: <a href="https://frankfurter.dev/"' +
+    ' target="_blank">Frankfurter API</a>' +
+    ' &mdash; Stocks/Indices/ETFs: ' +
+    '<a href="https://finance.yahoo.com"' +
+    ' target="_blank">Yahoo Finance</a></p>';
+  grid.innerHTML = h;
+}
+
+/* ======= LOAD ALL ======= */
+async function loadAll() {
+  var now = new Date();
+  document.getElementById("genTime")
+    .textContent = "Generated on " +
+    now.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }) + " at " +
+    now.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit"
+    });
+
+  buildCards();
+
+  CHARTS_CONFIG.forEach(function(cfg, i) {
+    var lbl = cfg.label;
+    var idx = lbl.indexOf("&#8212;");
+    if (idx > 0) {
+      lbl = lbl.substring(0, idx).trim();
+      lbl = lbl.replace(/&amp;/g, "&");
+    } else if (cfg.ticker) {
+      lbl = cfg.ticker;
+    }
+    var item = {
+      shortLabel: lbl,
+      unit: cfg.unit,
+      color: COLORS[i % COLORS.length],
+      dates: null,
+      rates: null
+    };
+    allChartData.push(item);
+    chartInstances.push(createChart(i, item));
+  });
+
+  var total = CHARTS_CONFIG.length;
+  var loaded = 0;
+  var errors = 0;
+
+  var promises = CHARTS_CONFIG.map(
+    function(cfg, i) {
+      var p;
+      if (cfg.source === "fx") {
+        p = fetchFX(cfg.base, cfg.quote);
+      } else {
+        p = fetchYahoo(cfg.ticker);
+      }
+      return p.then(function(result) {
+        allChartData[i].dates = result.dates;
+        allChartData[i].rates = result.rates;
+        var card = document.getElementById(
+          "card_" + i);
+        card.classList.remove("loading");
+        loaded++;
+        setStatus(
+          "Loaded " + loaded + "/" + total +
+          (errors
+            ? " (" + errors + " errors)"
+            : "") + "...");
+        setRange(activeRange);
+      }).catch(function(err) {
+        console.error(
+          "Failed: " + cfg.label, err);
+        var card = document.getElementById(
+          "card_" + i);
+        card.classList.remove("loading");
+        card.classList.add("error");
+        document.getElementById("rate_" + i)
+          .textContent = "Failed to load";
+        errors++;
+        loaded++;
+        setStatus(
+          "Loaded " + loaded + "/" + total +
+          " (" + errors + " errors)...");
+      });
+    }
+  );
+
+  await Promise.all(promises);
+  var msg = "All data loaded";
+  if (errors) msg += " (" + errors + " failed)";
+  setStatus(msg, true);
+}
+
+document.addEventListener("DOMContentLoaded", loadAll);
+</script>
+</body>
+</html>
