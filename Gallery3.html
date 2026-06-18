@@ -173,6 +173,7 @@
       break-inside: avoid;
       margin: 0 0 60px;
       cursor: zoom-in;
+      position: relative;
     }
 
     .shot img {
@@ -190,6 +191,24 @@
       opacity: 1;
       transform: translateY(-2px);
     }
+
+    /* Small external-link badge shown only on shots that have a link */
+    .shot .ext-link {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid #333;
+      padding: 6px 8px;
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .shot:hover .ext-link { opacity: 1; }
 
     /* Optional: very subtle caption style (off by default) */
     .caption {
@@ -265,7 +284,8 @@
       z-index: 2100;
     }
 
-    .lb-close {
+    .lb-close,
+    .lb-open-link {
       border: 1px solid #222;
       background: rgba(0,0,0,0.35);
       color: #fff;
@@ -276,7 +296,10 @@
       padding: 12px 14px;
       transition: background 0.2s ease, opacity 0.2s ease;
     }
-    .lb-close:hover { background: rgba(255,255,255,0.06); }
+    .lb-close:hover,
+    .lb-open-link:hover { background: rgba(255,255,255,0.06); }
+
+    .lb-open-link.hidden { display: none; }
 
     /* ========================================
        FOOTER
@@ -379,6 +402,7 @@
   ======================================== -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lb-top">
+      <a class="lb-open-link hidden" id="lbOpenLink" href="#" target="_blank" rel="noopener">View Link</a>
       <button class="lb-close" id="lbClose" type="button">Close</button>
     </div>
 
@@ -406,6 +430,11 @@
   <script>
     /* ========================================================================
        SERIES CONFIG — EDIT THIS ONLY
+
+       Each entry in `images` is an object: { src, link }
+       - src  : filename of the image (required)
+       - link : URL to open when clicked (optional — set to null or omit
+                entirely if the image has no link)
        ======================================================================== */
     const SERIES = {
       title: "Published Books",
@@ -419,30 +448,9 @@
           link: "https://www.lulu.com/shop/martin-cueva/america-latina/hardcover/product-m6wkyj.html?page=1&pageSize=4"
         },
         {
-          "Gallery3_1.jpeg"
-          /*link: "https://peque%C3%B1o-hombre-en-un-momento-gigante-09f3a6a539b4?postPublishedType=repub"
-       */
+          src: "Gallery3_1.jpeg",
+          link: null
         }
-        /*
-        {
-          src: "Gallery3_2.jpeg",
-          link: "https://www.lulu.com/shop/martin-cueva/america-latina/hardcover/product-m6wkyj.html?page=1&pageSize=4"
-        }
-    
-        {
-          src: "Gallery6_3.jpg",
-          link: "https://medium.com/@ocueva/hacen-falta-ingenieros-94cc4dd92993"
-        },
-        {
-          src: "Gallery6_4.jpg",
-          link: "https://medium.com/@ocueva/html-script-to-measure-the-finantial-markets-3cb8227b9bec"
-        }
-        /*
-        {
-          src: "Gallery6_5.jpg",
-          link: "https://xx.com"
-        }
-        */
       ]
     };
 
@@ -458,6 +466,7 @@
     const lbClose = document.getElementById("lbClose");
     const lbPrev = document.getElementById("lbPrev");
     const lbNext = document.getElementById("lbNext");
+    const lbOpenLink = document.getElementById("lbOpenLink");
 
     let currentIndex = 0;
 
@@ -472,17 +481,25 @@
     function renderGallery() {
       const frag = document.createDocumentFragment();
 
-      SERIES.images.forEach((src, idx) => {
+      SERIES.images.forEach((item, idx) => {
         const shot = document.createElement("div");
         shot.className = "shot";
         shot.setAttribute("data-index", idx);
 
         const img = document.createElement("img");
-        img.src = src;
+        img.src = item.src;
         img.alt = `${SERIES.title} ${String(idx + 1).padStart(2, "0")}`;
         img.loading = "lazy";
 
         shot.appendChild(img);
+
+        // Small visual cue when an image has an associated link
+        if (item.link) {
+          const badge = document.createElement("span");
+          badge.className = "ext-link";
+          badge.textContent = "Link ↗";
+          shot.appendChild(badge);
+        }
 
         // Click to open lightbox
         shot.addEventListener("click", () => openLightbox(idx));
@@ -493,10 +510,22 @@
       galleryEl.appendChild(frag);
     }
 
+    function updateLightboxLink() {
+      const item = SERIES.images[currentIndex];
+      if (item.link) {
+        lbOpenLink.href = item.link;
+        lbOpenLink.classList.remove("hidden");
+      } else {
+        lbOpenLink.removeAttribute("href");
+        lbOpenLink.classList.add("hidden");
+      }
+    }
+
     function openLightbox(idx) {
       currentIndex = idx;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+      updateLightboxLink();
 
       lightboxEl.classList.add("active");
       lightboxEl.setAttribute("aria-hidden", "false");
@@ -512,14 +541,16 @@
 
     function showPrev() {
       currentIndex = (currentIndex - 1 + SERIES.images.length) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+      updateLightboxLink();
     }
 
     function showNext() {
       currentIndex = (currentIndex + 1) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
+      lbImg.src = SERIES.images[currentIndex].src;
       lbImg.alt = `${SERIES.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+      updateLightboxLink();
     }
 
     function toggleMenu() {
@@ -539,6 +570,9 @@
     lbClose.addEventListener("click", closeLightbox);
     lbPrev.addEventListener("click", showPrev);
     lbNext.addEventListener("click", showNext);
+
+    // Stop the "open link" button click from also closing the lightbox
+    lbOpenLink.addEventListener("click", (e) => e.stopPropagation());
 
     // Click outside the image area closes
     lightboxEl.addEventListener("click", (e) => {
