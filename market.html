@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FX Stock Market Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#121212; --sf:#1e1e1e; --bd:#333; --tx:#e0e0e0;
+  --tx2:#aaa; --ac:#4fc3f7; --gn:#66bb6a; --rd:#ef5350;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--tx);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  padding:24px; max-width:1400px; margin:0 auto;
+  -webkit-text-size-adjust:100%;
+}
+h1{color:var(--ac); margin-bottom:4px; font-size:24px}
+.subtitle{color:var(--tx2); margin-bottom:8px; font-size:13px}
+
+.global-bar{
+  display:flex; align-items:center; gap:6px;
+  margin-bottom:22px; flex-wrap:wrap;
+  padding:10px 0; border-bottom:1px solid var(--bd);
+}
+.global-bar .hint{color:var(--tx2); font-size:13px; font-weight:600}
+.bb-toggle{
+  margin-left:auto; display:flex; align-items:center; gap:6px;
+  color:var(--tx2); font-size:12px;
+  background:var(--sf); border:1px solid var(--bd);
+  border-radius:6px; padding:4px 10px; user-select:none;
+}
+.bb-toggle input,.bb-toggle label{cursor:pointer}
+.bb-toggle input[type=number]{
+  width:46px; background:#111; color:var(--tx);
+  border:1px solid var(--bd); border-radius:4px;
+  padding:2px 4px; font-size:11px;
+  font-family:'Cascadia Code',monospace;
+}
+.section-title{
+  color:var(--ac); font-size:18px;
+  margin:28px 0 16px; padding-bottom:8px;
+  border-bottom:1px solid var(--bd);
+  grid-column:1/-1;
+}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+@media (max-width:900px){
+  body{padding:14px}
+  .grid{grid-template-columns:1fr; gap:14px}
+  .bb-toggle{margin-left:0; width:100%; justify-content:space-between; flex-wrap:wrap}
+  .card{padding:14px}
+  canvas{height:220px !important}
+}
+.card{
+  background:var(--sf); border:1px solid var(--bd);
+  border-radius:10px; padding:20px;
+  contain:layout paint;
+  content-visibility:auto;
+  contain-intrinsic-size:auto 460px;
+}
+.card h2{color:var(--ac); font-size:15px; margin-bottom:8px}
+.card.loading h2::after{
+  content:" loading..."; font-size:11px;
+  color:var(--tx2); animation:pulse 1.5s infinite;
+}
+.card.error{border-color:var(--rd)}
+.card.cached h2::after{content:" (cached)"; font-size:10px; color:var(--gn)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.card-range-bar{
+  display:flex; flex-wrap:wrap; gap:4px;
+  margin:8px 0 10px; padding-bottom:8px;
+  border-bottom:1px dashed var(--bd);
+}
+.card-range-bar .rbtn{
+  color:var(--tx2); background:#181818;
+  border:1px solid var(--bd); border-radius:4px;
+  padding:3px 8px; font-size:11px; font-weight:600;
+  cursor:pointer; user-select:none;
+  transition:background .15s, border-color .15s, color .15s;
+}
+.card-range-bar .rbtn:hover{color:#fff; border-color:var(--ac); background:#1a2a3a}
+.card-range-bar .rbtn.active{color:#fff; background:var(--ac); border-color:var(--ac)}
+.card-range-bar .rbtn.loading{opacity:.55; cursor:wait}
+
+.current-rate{color:var(--tx); font-size:13px; margin-bottom:10px; line-height:1.6}
+.rate-value{
+  font-family:'Cascadia Code','Fira Code',Consolas,monospace;
+  font-size:17px; font-weight:700; color:#fff;
+}
+.pos{color:var(--gn); font-weight:600}
+.neg{color:var(--rd); font-weight:600}
+.stats-row{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+.stat{
+  background:#1a1a2e; border:1px solid var(--bd);
+  border-radius:6px; padding:6px 10px;
+  flex:1; min-width:80px; text-align:center;
+}
+.stat-label{display:block; font-size:9px; text-transform:uppercase;
+  letter-spacing:1px; color:var(--tx2); margin-bottom:2px;}
+.stat-value{font-family:'Cascadia Code',monospace; font-size:13px;
+  font-weight:600; color:var(--tx);}
+.chart-wrap{position:relative; height:230px}
+canvas{margin-top:6px; display:block; width:100% !important; height:100% !important}
+.footer{text-align:center; color:var(--tx2); font-size:11px;
+  margin-top:16px; grid-column:1/-1;}
+.footer a{color:var(--ac); text-decoration:none}
+.status-bar{
+  color:var(--tx2); font-size:12px;
+  padding:6px 0; margin-bottom:10px;
+  border-bottom:1px solid var(--bd);
+  display:flex; align-items:center; gap:8px;
+}
+.spinner{display:inline-block; width:14px; height:14px;
+  border:2px solid var(--bd); border-top-color:var(--ac);
+  border-radius:50%; animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{height:3px; background:var(--bd); border-radius:2px;
+  overflow:hidden; flex:1; max-width:200px}
+.progress-bar{height:100%; background:var(--ac); width:0%; transition:width .3s}
+</style>
+</head>
+<body>
+<h1>&#128178; FX, Stock &amp; Market Dashboard</h1>
+<p class="subtitle" id="genTime"></p>
+<div class="status-bar" id="statusBar">
+  <span class="spinner" id="spinner"></span>
+  <span id="statusText">Loading default 1D snapshot...</span>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+<div class="global-bar">
+  <span class="hint">Tip: pick a time range on each chart &mdash; data loads on demand.</span>
+  <div class="bb-toggle">
+    <input type="checkbox" id="bbToggle" checked onchange="onBBChange()">
+    <label for="bbToggle">Bollinger Bands</label>
+    <span style="color:var(--bd)">|</span>
+    <label for="bbPeriod" title="Moving average window">N=</label>
+    <input type="number" id="bbPeriod" value="20" min="2" max="200" onchange="onBBChange()">
+    <label for="bbStdev" title="Standard deviations">K=</label>
+    <input type="number" id="bbStdev" value="2" min="0.5" max="5" step="0.5" onchange="onBBChange()">
+  </div>
+</div>
+<div class="grid" id="chartGrid"></div>
+<script>
+/* ============ DEVICE DETECTION ============ */
+var IS_MOBILE = window.matchMedia("(max-width:900px)").matches
+             || /Mobi|Android/i.test(navigator.userAgent);
+var MAX_POINTS  = IS_MOBILE ? 180 : 450;
+var DPR_CAP     = IS_MOBILE ? 1.5 : 2;
+
+/* ============ CHARTS CONFIG ============ */
+var CHARTS_CONFIG = [
+  {section:"&#127760; Exchange Rates",
+   source:"fx",base:"USD",quote:"COP",label:"USD / COP &#8212; US Dollar to Colombian Peso",unit:"COP"},
+  {source:"fx",base:"USD",quote:"PEN",label:"USD / PEN &#8212; US Dollar to Peruvian Sol",unit:"PEN"},
+  {source:"fx",base:"USD",quote:"JPY",label:"USD / JPY &#8212; US Dollar to Japanese Yen",unit:"JPY"},
+  {source:"fx",base:"GBP",quote:"EUR",label:"GBP / EUR &#8212; British Pound to Euro",unit:"EUR"},
+  {source:"fx",base:"USD",quote:"EUR",label:"USD / EUR &#8212; US Dollar to Euro",unit:"EUR"},
+  {section:"&#128202; Market Indices &amp; Bonds",
+   source:"yahoo",ticker:"^GSPC",label:"S&amp;P 500 Index",unit:"pts"},
+  {source:"yahoo",ticker:"^IXIC",label:"NASDAQ Composite",unit:"pts"},
+  {source:"yahoo",ticker:"^VIX", label:"CBOE Volatility Index (VIX)",unit:"pts"},
+  {source:"yahoo",ticker:"^TNX", label:"US 10-Year Treasury Yield",unit:"%"},
+  {section:"&#128200; Lima Stock Prices",
+   source:"yahoo",ticker:"VOLCABC1.LM",label:"VOLCABC1.LM &#8212; Volcan Minera Class B",unit:"PEN"},
+  {source:"yahoo",ticker:"CORAREI1.LM",label:"CORAREI1.LM &#8212; Corp. Aceros Arequipa",unit:"PEN"},
+  {section:"&#129302; AI &amp; Robotics ETFs",
+   source:"yahoo",ticker:"QTUM",label:"QTUM &#8212; Defiance Quantum ETF",unit:"USD"},
+  {source:"yahoo",ticker:"ROBO",label:"ROBO &#8212; ROBO Global Robotics ETF",unit:"USD"}
+];
+var COLORS=["#4fc3f7","#66bb6a","#ffa726","#ec407a","#ab47bc","#26c6da",
+            "#ef5350","#fdd835","#78909c","#7e57c2","#29b6f6","#9ccc65","#ff7043"];
+
+/* === PER-CHART RANGE OPTIONS ===
+   `days`       = how many days of history to fetch
+   `cutoffDays` = (optional) what to clip for the visible window (defaults to `days`)
+   `ytd`        = true means: from Jan 1 of current year to today */
+var RANGES = [
+  {key:"1D",  label:"1D",  days:5,      cutoffDays:1},
+  {key:"15D", label:"15D", days:25,     cutoffDays:15},
+  {key:"1M",  label:"1M",  days:35},
+  {key:"3M",  label:"3M",  days:95},
+  {key:"6M",  label:"6M",  days:190},
+  {key:"YTD", label:"YTD", ytd:true},
+  {key:"1Y",  label:"1Y",  days:380},
+  {key:"2Y",  label:"2Y",  days:740},
+  {key:"5Y",  label:"5Y",  days:1850},
+  {key:"10Y", label:"10Y", days:3680},
+  {key:"20Y", label:"20Y", days:7320},
+  {key:"30Y", label:"30Y", days:10970}
+];
+var DEFAULT_RANGE = "1D";
+
+/* === TUNABLES === */
+var CONCURRENCY_FX = 6;
+var CONCURRENCY_YH = IS_MOBILE ? 3 : 4;
+var FETCH_TIMEOUT_MS = 18000;
+var MAX_RETRIES = 1;
+var CACHE_TTL_MS  = 10*60*1000;
+var CACHE_TTL_LS  = 24*60*60*1000;
+
+/* === BB STYLE === */
+var BB_UPPER_COLOR="#ef5350", BB_LOWER_COLOR="#66bb6a",
+    BB_MIDDLE_COLOR="#ffa726", BB_FILL_COLOR="rgba(255,167,38,0.08)";
+
+/* ===== STATE =====
+   allChartData[i] = {
+     cfg, color, shortLabel, unit,
+     currentRange: "1D",
+     rangeCache: { "1D": {dates, rates}, "5Y": {...}, ... },  // in-memory cache
+     loadingRange: null
+   } */
+var allChartData=[], chartInstances=[];
+var bbEnabled=true, bbPeriod=20, bbStdev=2;
+var visibleIdx = new Set();
+var loadedCount = 0;
+
+/* ============ HELPERS ============ */
+function pad2(n){return String(n).padStart(2,"0")}
+function dateStr(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())}
+function fmtRate(v){
+  if(v==null||isNaN(v))return"\u2014";
+  if(v<10)return v.toFixed(4);
+  return v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function getRangeSpec(key){
+  for(var i=0;i<RANGES.length;i++) if(RANGES[i].key===key) return RANGES[i];
+  return RANGES[0];
+}
+function getCutoffStr(rangeKey){
+  var r=getRangeSpec(rangeKey);
+  var now=new Date();
+  if(r.ytd) return dateStr(new Date(now.getFullYear(),0,1));
+  var d=r.cutoffDays!=null ? r.cutoffDays : r.days;
+  var c=new Date(now.getTime()-d*86400000);
+  return dateStr(c);
+}
+function getFetchDays(rangeKey){
+  var r=getRangeSpec(rangeKey);
+  if(r.ytd){
+    var now=new Date();
+    var jan1=new Date(now.getFullYear(),0,1);
+    return Math.ceil((now-jan1)/86400000)+5;
+  }
+  return r.days;
+}
+function setStatus(msg,done){
+  document.getElementById("statusText").textContent=msg;
+  if(done){
+    var sp=document.getElementById("spinner");
+    if(sp) sp.outerHTML='<span style="color:var(--gn);font-size:16px">&#10003;</span>';
+  }
+}
+function updateProgress(){
+  var pct=Math.round((loadedCount/CHARTS_CONFIG.length)*100);
+  document.getElementById("progressBar").style.width=pct+"%";
+}
+
+/* ============ BOLLINGER BANDS (computed on demand per chart) ============ */
+function computeBollinger(rates,period,k){
+  var n=rates.length;
+  var upper=new Array(n).fill(null);
+  var middle=new Array(n).fill(null);
+  var lower=new Array(n).fill(null);
+  if(n<period||period<2) return {upper:upper,middle:middle,lower:lower};
+  var sum=0,sumSq=0;
+  for(var i=0;i<period;i++){sum+=rates[i]; sumSq+=rates[i]*rates[i];}
+  function fillAt(i){
+    var mean=sum/period;
+    var v=(sumSq/period)-mean*mean; if(v<0)v=0;
+    var sd=Math.sqrt(v);
+    middle[i]=mean; upper[i]=mean+k*sd; lower[i]=mean-k*sd;
+  }
+  fillAt(period-1);
+  for(var j=period;j<n;j++){
+    var out=rates[j-period], inn=rates[j];
+    sum+=inn-out; sumSq+=inn*inn-out*out;
+    fillAt(j);
+  }
+  return {upper:upper,middle:middle,lower:lower};
+}
+
+/* ============ DOWNSAMPLER (LTTB-lite) ============ */
+function downsampleIndices(values,target){
+  var n=values.length;
+  if(n<=target) {
+    var all=new Array(n); for(var i=0;i<n;i++) all[i]=i; return all;
+  }
+  var out=[0];
+  var bucketSize=(n-2)/(target-2);
+  var a=0;
+  for(var i=0;i<target-2;i++){
+    var rangeStart=Math.floor((i+1)*bucketSize)+1;
+    var rangeEnd  =Math.floor((i+2)*bucketSize)+1;
+    rangeEnd=Math.min(rangeEnd,n);
+    var avgX=0,avgY=0,avgN=rangeEnd-rangeStart;
+    for(var k=rangeStart;k<rangeEnd;k++){avgX+=k; avgY+=values[k]||0;}
+    avgX/=avgN; avgY/=avgN;
+    var rs=Math.floor(i*bucketSize)+1, re=Math.floor((i+1)*bucketSize)+1;
+    var pax=a, pay=values[a]||0;
+    var maxArea=-1, nextA=rs;
+    for(var j=rs;j<re;j++){
+      var area=Math.abs((pax-avgX)*((values[j]||0)-pay)-(pax-j)*(avgY-pay))*0.5;
+      if(area>maxArea){maxArea=area; nextA=j;}
+    }
+    out.push(nextA); a=nextA;
+  }
+  out.push(n-1);
+  return out;
+}
+
+/* ============ TWO-TIER CACHE (keyed per range) ============ */
+function cacheKey(src,id,rangeKey){return"fxdash:"+src+":"+id+":"+rangeKey}
+function cacheGet(key){
+  try{
+    var raw=sessionStorage.getItem(key);
+    if(raw){
+      var o=JSON.parse(raw);
+      if(Date.now()-o.t<=CACHE_TTL_MS) return o.d;
+      sessionStorage.removeItem(key);
+    }
+  }catch(e){}
+  try{
+    var raw2=localStorage.getItem(key);
+    if(raw2){
+      var o2=JSON.parse(raw2);
+      if(Date.now()-o2.t<=CACHE_TTL_LS) return o2.d;
+      localStorage.removeItem(key);
+    }
+  }catch(e){}
+  return null;
+}
+function cacheSet(key,data){
+  var payload=JSON.stringify({t:Date.now(),d:data});
+  try{sessionStorage.setItem(key,payload)}catch(e){}
+  try{localStorage.setItem(key,payload)}catch(e){
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k=localStorage.key(i);
+        if(k&&k.indexOf("fxdash:")===0){localStorage.removeItem(k);break;}
+      }
+      localStorage.setItem(key,payload);
+    }catch(_){}
+  }
+}
+
+/* ============ FETCH HELPERS ============ */
+function fetchWithTimeout(url,ms){
+  var ctrl=new AbortController();
+  var tid=setTimeout(function(){ctrl.abort()},ms);
+  return fetch(url,{signal:ctrl.signal})
+    .then(function(r){clearTimeout(tid); return r})
+    .catch(function(e){clearTimeout(tid); throw e});
+}
+async function fetchFX(base,quote,rangeKey){
+  var key=cacheKey("fx",base+quote,rangeKey);
+  var cached=cacheGet(key);
+  if(cached) return {data:cached,fromCache:true};
+  var now=new Date();
+  var days=getFetchDays(rangeKey);
+  var from=new Date(now.getTime()-days*86400000);
+  var url="https://api.frankfurter.dev/v2/rates?base="+base+"&quotes="+quote+
+          "&from="+dateStr(from)+"&to="+dateStr(now);
+  var lastErr;
+  for(var a=0;a<=MAX_RETRIES;a++){
+    try{
+      var resp=await fetchWithTimeout(url,FETCH_TIMEOUT_MS);
+      if(!resp.ok) throw new Error("HTTP "+resp.status);
+      var data=await resp.json();
+      var dates=[],rates=[];
+      if(Array.isArray(data)){
+        data.forEach(function(e){dates.push(e.date); rates.push(e.rate);});
+      } else if(data && data.rates){
+        // Fallback to classic {rates:{date:{quote:val}}} shape.
+        var ks=Object.keys(data.rates).sort();
+        ks.forEach(function(d){
+          var v=data.rates[d][quote];
+          if(v!=null){dates.push(d); rates.push(v);}
+        });
+      }
+      var out={dates:dates,rates:rates};
+      cacheSet(key,out);
+      return {data:out,fromCache:false};
+    }catch(e){
+      lastErr=e;
+      if(a<MAX_RETRIES) await new Promise(r=>setTimeout(r,800));
+    }
+  }
+  throw lastErr||new Error("FX fetch failed");
+}
+async function fetchYahoo(ticker,rangeKey){
+  var key=cacheKey("yh",ticker,rangeKey);
+  var cached=cacheGet(key);
+  if(cached) return {data:cached,fromCache:true};
+  var now=Math.floor(Date.now()/1000);
+  var days=getFetchDays(rangeKey);
+  var from=now-Math.max(days,2)*86400;
+  // Coarser interval for very long ranges = much smaller payloads.
+  var interval="1d";
+  if(days>=7000) interval="1mo";
+  else if(days>=2500) interval="1wk";
+  var yUrl="https://query1.finance.yahoo.com/v8/finance/chart/"+
+    encodeURIComponent(ticker)+"?period1="+from+"&period2="+now+
+    "&interval="+interval+"&includePrePost=false&events=";
+  var proxies=[
+    "https://corsproxy.io/?"+encodeURIComponent(yUrl),
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(yUrl),
+    "https://api.codetabs.com/v1/proxy/?quest="+encodeURIComponent(yUrl)
+  ];
+  function tryOne(url){
+    return fetchWithTimeout(url,FETCH_TIMEOUT_MS).then(function(resp){
+      if(!resp.ok) throw new Error("HTTP "+resp.status);
+      return resp.json();
+    }).then(function(data){
+      var result=data&&data.chart&&data.chart.result&&data.chart.result[0];
+      if(!result) throw new Error("Bad payload");
+      var ts=result.timestamp||[];
+      var closes=result.indicators.quote[0].close||[];
+      var dates=[],rates=[];
+      for(var j=0;j<ts.length;j++){
+        if(closes[j]!=null){
+          dates.push(dateStr(new Date(ts[j]*1000)));
+          rates.push(Math.round(closes[j]*10000)/10000);
+        }
+      }
+      if(!dates.length) throw new Error("Empty series");
+      return {dates:dates,rates:rates};
+    });
+  }
+  var lastErr;
+  for(var a=0;a<=MAX_RETRIES;a++){
+    try{
+      var out=await Promise.any(proxies.map(tryOne));
+      cacheSet(key,out);
+      return {data:out,fromCache:false};
+    }catch(e){
+      lastErr=e;
+      if(a<MAX_RETRIES) await new Promise(r=>setTimeout(r,1000));
+    }
+  }
+  throw lastErr||new Error("Yahoo fetch failed: "+ticker);
+}
+
+/* ============ CONCURRENCY LIMITER ============ */
+async function runWithLimit(tasks,limit){
+  var i=0,workers=[];
+  for(var w=0;w<limit;w++){
+    workers.push((async function(){
+      while(i<tasks.length){ var idx=i++; await tasks[idx](); }
+    })());
+  }
+  await Promise.all(workers);
+}
+
+/* ============ CHART CREATION ============ */
+function createChart(idx,item){
+  var ctx=document.getElementById("chart_"+idx);
+  return new Chart(ctx,{
+    type:"line",
+    data:{labels:[],datasets:[
+      {label:"BB Upper", data:[], borderColor:BB_UPPER_COLOR,
+       backgroundColor:BB_FILL_COLOR, borderWidth:1, borderDash:[4,3],
+       fill:"+2", tension:0, pointRadius:0, pointHitRadius:6,
+       hidden:!bbEnabled, order:2, spanGaps:true},
+      {label:"BB Middle (SMA)", data:[], borderColor:BB_MIDDLE_COLOR,
+       backgroundColor:"transparent", borderWidth:1, borderDash:[2,3],
+       fill:false, tension:0, pointRadius:0, pointHitRadius:6,
+       hidden:!bbEnabled, order:2, spanGaps:true},
+      {label:"BB Lower", data:[], borderColor:BB_LOWER_COLOR,
+       backgroundColor:"transparent", borderWidth:1, borderDash:[4,3],
+       fill:false, tension:0, pointRadius:0, pointHitRadius:6,
+       hidden:!bbEnabled, order:2, spanGaps:true},
+      {label:item.shortLabel, data:[], borderColor:item.color,
+       backgroundColor:item.color+"22", borderWidth:2,
+       fill:false, tension:0, pointRadius:0, pointHitRadius:10, order:1}
+    ]},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      devicePixelRatio:Math.min(window.devicePixelRatio||1, DPR_CAP),
+      animation:false,
+      animations:{colors:false, x:false, y:false},
+      transitions:{active:{animation:{duration:0}}},
+      resizeDelay:120,
+      normalized:true,
+      interaction:{intersect:false, mode:"index"},
+      plugins:{
+        title:{display:false},
+        legend:{display:false},
+        tooltip:{
+          enabled:true,
+          animation:false,
+          filter:function(c){return c.parsed.y!=null},
+          callbacks:{
+            label:function(c){
+              return c.dataset.label+": "+fmtRate(c.parsed.y)+" "+item.unit;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{color:"#aaa", maxTicksLimit:IS_MOBILE?6:12,
+                  font:{size:11}, autoSkip:true},
+           grid:{color:"#333", display:!IS_MOBILE}},
+        y:{ticks:{color:"#aaa", font:{size:11}, maxTicksLimit:IS_MOBILE?5:8,
+                  callback:function(v){
+                    if(v<10) return v.toFixed(4);
+                    return v.toLocaleString();
+                  }},
+           grid:{color:"#333"}}
+      }
+    }
+  });
+}
+
+/* ============ RENDER ONE CHART FROM ITS CACHED RANGE DATA ============ */
+function renderChartForRange(i){
+  var item=allChartData[i];
+  if(!item) return;
+  var rangeKey=item.currentRange;
+  var raw=item.rangeCache[rangeKey];
+  if(!raw||!raw.dates||!raw.dates.length) return;
+
+  var cutoffStr=getCutoffStr(rangeKey);
+  var label=getRangeSpec(rangeKey).label;
+
+  // Bollinger Bands are computed here, on demand, for this range only.
+  var bb=computeBollinger(raw.rates,bbPeriod,bbStdev);
+
+  var dates=[],rates=[],up=[],mid=[],lo=[];
+  for(var j=0;j<raw.dates.length;j++){
+    if(raw.dates[j]>=cutoffStr){
+      dates.push(raw.dates[j]);
+      rates.push(raw.rates[j]);
+      up.push(bb.upper[j]); mid.push(bb.middle[j]); lo.push(bb.lower[j]);
+    }
+  }
+  if(!dates.length){
+    dates=raw.dates.slice(); rates=raw.rates.slice();
+    up=bb.upper.slice(); mid=bb.middle.slice(); lo=bb.lower.slice();
+  }
+
+  var mn=Infinity,mx=-Infinity,sm=0;
+  for(var k=0;k<rates.length;k++){
+    var r=rates[k]; if(r<mn)mn=r; if(r>mx)mx=r; sm+=r;
+  }
+  var avg=sm/rates.length;
+  var first=rates[0], last=rates[rates.length-1];
+  var change=first ? ((last-first)/first)*100 : 0;
+
+  var idxs=downsampleIndices(rates,MAX_POINTS);
+  var dDates=new Array(idxs.length), dRates=new Array(idxs.length),
+      dUp   =new Array(idxs.length), dMid  =new Array(idxs.length),
+      dLo   =new Array(idxs.length);
+  for(var q=0;q<idxs.length;q++){
+    var ix=idxs[q];
+    dDates[q]=dates[ix]; dRates[q]=rates[ix];
+    dUp[q]=up[ix]; dMid[q]=mid[ix]; dLo[q]=lo[ix];
+  }
+
+  var ch=chartInstances[i];
+  ch.data.labels=dDates;
+  ch.data.datasets[0].data=dUp;
+  ch.data.datasets[1].data=dMid;
+  ch.data.datasets[2].data=dLo;
+  ch.data.datasets[3].data=dRates;
+  ch.data.datasets[0].hidden=!bbEnabled;
+  ch.data.datasets[1].hidden=!bbEnabled;
+  ch.data.datasets[2].hidden=!bbEnabled;
+
+  if(visibleIdx.has(i)){
+    ch.update("none");
+    item._pending=false;
+  } else {
+    item._pending=true;
+  }
+
+  document.getElementById("min_"+i).textContent=fmtRate(mn);
+  document.getElementById("max_"+i).textContent=fmtRate(mx);
+  document.getElementById("avg_"+i).textContent=fmtRate(avg);
+  document.getElementById("min_lbl_"+i).textContent=label+" Low";
+  document.getElementById("max_lbl_"+i).textContent=label+" High";
+  document.getElementById("avg_lbl_"+i).textContent=label+" Avg";
+  var absC=Math.abs(change).toFixed(2);
+  var arrow=change>=0?"&#9650;":"&#9660;";
+  var cls=change>=0?"pos":"neg";
+  document.getElementById("change_"+i).innerHTML=
+    '<span class="'+cls+'"> '+arrow+' '+absC+'% ('+label+')</span>';
+  document.getElementById("rate_"+i).textContent=fmtRate(last)+" "+item.unit;
+  document.getElementById("date_"+i).textContent=dates[dates.length-1];
+
+  var bbInfo=document.getElementById("bbinfo_"+i);
+  if(bbInfo){
+    var lU=up[up.length-1], lM=mid[mid.length-1], lL=lo[lo.length-1];
+    if(lU!=null && bbEnabled){
+      var pctB=(lU!==lL)?((last-lL)/(lU-lL))*100:50;
+      var width=lM ? ((lU-lL)/lM)*100 : 0;
+      bbInfo.innerHTML=
+        ' &middot; BB('+bbPeriod+','+bbStdev+'): '+
+        '<span style="color:'+BB_LOWER_COLOR+'">'+fmtRate(lL)+'</span> / '+
+        '<span style="color:'+BB_MIDDLE_COLOR+'">'+fmtRate(lM)+'</span> / '+
+        '<span style="color:'+BB_UPPER_COLOR+'">'+fmtRate(lU)+'</span> '+
+        '<span style="color:var(--tx2)">(%B '+pctB.toFixed(0)+
+        ', width '+width.toFixed(2)+'%)</span>';
+    } else { bbInfo.textContent=""; }
+  }
+}
+
+/* ============ LOAD (or use cache) THEN RENDER ONE CHART ============ */
+async function loadRangeForChart(i,rangeKey){
+  var item=allChartData[i];
+  if(!item) return;
+
+  // Reflect the active range immediately on this card's bar.
+  var bar=document.getElementById("rangebar_"+i);
+  if(bar){
+    bar.querySelectorAll(".rbtn").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-range")===rangeKey);
+    });
+  }
+  item.currentRange=rangeKey;
+
+  // Already in memory? Just re-render (BB also recomputed on demand).
+  if(item.rangeCache[rangeKey]){
+    renderChartForRange(i);
+    return;
+  }
+
+  // De-dupe if the same range is already being fetched for this chart.
+  if(item.loadingRange===rangeKey) return;
+  item.loadingRange=rangeKey;
+
+  var card=document.getElementById("card_"+i);
+  if(card) card.classList.add("loading");
+  if(bar){
+    var btn=bar.querySelector('[data-range="'+rangeKey+'"]');
+    if(btn) btn.classList.add("loading");
+  }
+
+  var cfg=item.cfg;
+  try{
+    var res = cfg.source==="fx"
+      ? await fetchFX(cfg.base,cfg.quote,rangeKey)
+      : await fetchYahoo(cfg.ticker,rangeKey);
+    item.rangeCache[rangeKey]={dates:res.data.dates,rates:res.data.rates};
+    if(card){
+      card.classList.remove("loading","error");
+      if(res.fromCache) card.classList.add("cached"); else card.classList.remove("cached");
+    }
+    if(item.currentRange===rangeKey){
+      renderChartForRange(i);
+    }
+  }catch(err){
+    console.error("Failed:",cfg.label,err);
+    if(card){ card.classList.remove("loading"); card.classList.add("error"); }
+    var rateEl=document.getElementById("rate_"+i);
+    if(rateEl) rateEl.textContent
