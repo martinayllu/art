@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FX Stock Market Dashboard</title>
+<style>
+:root{--bg:#121212;--sf:#1e1e1e;--bd:#333;--tx:#e0e0e0;--tx2:#aaa;--ac:#4fc3f7;--gn:#66bb6a;--rd:#ef5350}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-serif;padding:24px;max-width:1400px;margin:0 auto}
+h1{color:var(--ac);margin-bottom:4px;font-size:24px}
+.subtitle{color:var(--tx2);margin-bottom:8px;font-size:13px}
+.global-bar{display:flex;align-items:center;gap:6px;margin-bottom:22px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--bd)}
+.global-bar .hint{color:var(--tx2);font-size:13px;font-weight:600}
+.bb-toggle{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--tx2);font-size:12px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;user-select:none}
+.bb-toggle input[type=number]{width:46px;background:#111;color:var(--tx);border:1px solid var(--bd);border-radius:4px;padding:2px 4px;font-size:11px;font-family:monospace}
+.section-title{color:var(--ac);font-size:18px;margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--bd);grid-column:1/-1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:900px){body{padding:14px}.grid{grid-template-columns:1fr;gap:14px}.bb-toggle{margin-left:0;width:100%}.card{padding:14px}canvas{height:220px!important}}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.card h2{color:var(--ac);font-size:15px;margin-bottom:8px}
+.card.loading h2::after{content:" loading…";font-size:11px;color:var(--tx2);animation:pulse 1.5s infinite}
+.card.error{border-color:var(--rd)}
+.card.cached h2::after{content:" (cached)";font-size:10px;color:var(--gn)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.card-range-bar{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 10px;padding-bottom:8px;border-bottom:1px dashed var(--bd)}
+.rbtn{color:var(--tx2);background:#181818;border:1px solid var(--bd);border-radius:4px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;user-select:none}
+.rbtn:hover{color:#fff;border-color:var(--ac);background:#1a2a3a}
+.rbtn.active{color:#fff;background:var(--ac);border-color:var(--ac)}
+.rbtn.loading{opacity:.55;cursor:wait}
+.current-rate{font-size:13px;margin-bottom:10px;line-height:1.6}
+.rate-value{font-family:monospace;font-size:17px;font-weight:700;color:#fff}
+.pos{color:var(--gn);font-weight:600}.neg{color:var(--rd);font-weight:600}
+.stats-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.stat{background:#1a1a2e;border:1px solid var(--bd);border-radius:6px;padding:6px 10px;flex:1;min-width:80px;text-align:center}
+.stat-label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);margin-bottom:2px}
+.stat-value{font-family:monospace;font-size:13px;font-weight:600}
+.chart-wrap{position:relative;height:230px}
+canvas{margin-top:6px;display:block;width:100%!important;height:100%!important}
+.footer{text-align:center;color:var(--tx2);font-size:11px;margin-top:16px;grid-column:1/-1}
+.status-bar{color:var(--tx2);font-size:12px;padding:6px 0;margin-bottom:10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{height:3px;background:var(--bd);border-radius:2px;overflow:hidden;flex:1;max-width:200px}
+.progress-bar{height:100%;background:var(--ac);width:0%;transition:width .3s}
+.fatal{color:var(--rd);font-weight:600}
+</style>
+</head>
+<body>
+<h1>💸 FX, Stock &amp; Market Dashboard</h1>
+<p class="subtitle" id="genTime"></p>
+
+<div class="status-bar" id="statusBar">
+  <span class="spinner" id="spinner"></span>
+  <span id="statusText">Loading Chart.js…</span>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+</div>
+
+<div class="global-bar">
+  <span class="hint">Tip: pick a range on each chart — data loads on demand.</span>
+  <div class="bb-toggle">
+    <input type="checkbox" id="bbToggle" checked>
+    <label for="bbToggle">Bollinger Bands</label>
+    <span style="color:var(--bd)">|</span>
+    <label for="bbPeriod">N=</label><input type="number" id="bbPeriod" value="20" min="2" max="200">
+    <label for="bbStdev">K=</label><input type="number" id="bbStdev" value="2" min="0.5" max="5" step="0.5">
+  </div>
+</div>
+
+<div class="grid" id="chartGrid"></div>
+
+<script>
+/* ===== CONFIG ===== */
+const IS_MOBILE = matchMedia("(max-width:900px)").matches || /Mobi|Android/i.test(navigator.userAgent);
+const MAX_POINTS = IS_MOBILE ? 180 : 450;
+const DPR_CAP = IS_MOBILE ? 1.5 : 2;
+const FETCH_TIMEOUT = 18000;
+const CACHE_TTL_SS = 10*60*1000;       // 10 min session
+const CACHE_TTL_LS = 24*60*60*1000;    // 24 h local
+const CONC_FX = 6, CONC_YH = IS_MOBILE ? 3 : 4;
+
+/* Currencies actually supported by Frankfurter (ECB reference set).
+   COP, PEN, and many others are NOT in this list — those pairs are routed to Yahoo. */
+const FRANKFURTER_CCY = new Set([
+  "AUD","BGN","BRL","CAD","CHF","CNY","CZK","DKK","EUR","GBP","HKD","HUF",
+  "IDR","ILS","INR","ISK","JPY","KRW","MXN","MYR","NOK","NZD","PHP","PLN",
+  "RON","SEK","SGD","THB","TRY","USD","ZAR"
+]);
+
+const CHARTS = [
+  {section:"🌐 Exchange Rates", source:"fx", base:"USD", quote:"COP", label:"USD / COP — US Dollar to Colombian Peso", unit:"COP"},
+  {source:"fx", base:"USD", quote:"PEN", label:"USD / PEN — US Dollar to Peruvian Sol", unit:"PEN"},
+  {source:"fx", base:"USD", quote:"JPY", label:"USD / JPY — US Dollar to Japanese Yen", unit:"JPY"},
+  {source:"fx", base:"GBP", quote:"EUR", label:"GBP / EUR — British Pound to Euro", unit:"EUR"},
+  {source:"fx", base:"USD", quote:"EUR", label:"USD / EUR — US Dollar to Euro", unit:"EUR"},
+  {section:"📊 Market Indices &amp; Bonds", source:"yahoo", ticker:"^GSPC", label:"S&amp;P 500 Index", unit:"pts"},
+  {source:"yahoo", ticker:"^IXIC", label:"NASDAQ Composite", unit:"pts"},
+  {source:"yahoo", ticker:"^VIX",  label:"CBOE Volatility Index (VIX)", unit:"pts"},
+  {source:"yahoo", ticker:"^TNX",  label:"US 10-Year Treasury Yield", unit:"%"},
+  {section:"📈 Lima Stock Prices", source:"yahoo", ticker:"VOLCABC1.LM", label:"VOLCABC1.LM — Volcan Minera Class B", unit:"PEN"},
+  {source:"yahoo", ticker:"CORAREI1.LM", label:"CORAREI1.LM — Corp. Aceros Arequipa", unit:"PEN"},
+  {section:"🤖 AI &amp; Robotics ETFs", source:"yahoo", ticker:"QTUM", label:"QTUM — Defiance Quantum ETF", unit:"USD"},
+  {source:"yahoo", ticker:"ROBO", label:"ROBO — ROBO Global Robotics ETF", unit:"USD"},
+];
+const COLORS = ["#4fc3f7","#66bb6a","#ffa726","#ec407a","#ab47bc","#26c6da","#ef5350","#fdd835","#78909c","#7e57c2","#29b6f6","#9ccc65","#ff7043"];
+
+const RANGES = [
+  {key:"1D",  fetchDays:5,     cutoffDays:1,    interval:"5m"},
+  {key:"15D", fetchDays:25,    cutoffDays:15,   interval:"1d"},
+  {key:"1M",  fetchDays:40,    cutoffDays:30,   interval:"1d"},
+  {key:"3M",  fetchDays:100,   cutoffDays:90,   interval:"1d"},
+  {key:"6M",  fetchDays:200,   cutoffDays:180,  interval:"1d"},
+  {key:"YTD", ytd:true,                          interval:"1d"},
+  {key:"1Y",  fetchDays:380,   cutoffDays:365,  interval:"1d"},
+  {key:"2Y",  fetchDays:740,   cutoffDays:730,  interval:"1d"},
+  {key:"5Y",  fetchDays:1850,  cutoffDays:1825, interval:"1wk"},
+  {key:"10Y", fetchDays:3680,  cutoffDays:3650, interval:"1wk"},
+  {key:"20Y", fetchDays:7320,  cutoffDays:7300, interval:"1mo"},
+  {key:"30Y", fetchDays:10970, cutoffDays:10950,interval:"1mo"},
+];
+const DEFAULT_RANGE = "1M";  // ← changed from "1D"
+const BB_UP="#ef5350", BB_LO="#66bb6a", BB_MD="#ffa726", BB_FILL="rgba(255,167,38,0.08)";
+
+/* ===== STATE ===== */
+const charts = [];
+let bbEnabled=true, bbPeriod=20, bbStdev=2, loadedCount=0;
+
+/* ===== HELPERS ===== */
+const pad2 = n => String(n).padStart(2,"0");
+const dateStr = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const fmtRate = v => v==null||isNaN(v) ? "—" : (Math.abs(v)<10 ? (+v).toFixed(4) : (+v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}));
+const getRange = k => RANGES.find(r=>r.key===k) || RANGES[0];
+function getFetchDays(k){const r=getRange(k); if(r.ytd){const n=new Date(),j=new Date(n.getFullYear(),0,1);return Math.max(2,Math.ceil((n-j)/86400000)+5);} return r.fetchDays;}
+function getCutoffStr(k){const r=getRange(k),n=new Date(); if(r.ytd)return dateStr(new Date(n.getFullYear(),0,1)); const d=r.cutoffDays??r.fetchDays; return dateStr(new Date(n-d*86400000));}
+const setStatus=(m,done)=>{document.getElementById("statusText").textContent=m; if(done){const s=document.getElementById("spinner"); if(s)s.outerHTML='<span style="color:var(--gn);font-size:16px">✓</span>';}};
+const setFatal=m=>{document.getElementById("statusText").innerHTML=`<span class="fatal">${m}</span>`; const s=document.getElementById("spinner"); if(s)s.style.display="none";};
+const bumpProgress=()=>{loadedCount++; document.getElementById("progressBar").style.width=Math.round(loadedCount/CHARTS.length*100)+"%";};
+
+/* ===== CHART.JS LOADER (CDN fallback) ===== */
+function loadChartJs(){
+  if(typeof Chart!=="undefined") return Promise.resolve();
+  const cdns=[
+    "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js",
+    "https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.7/chart.umd.min.js"
+  ];
+  return new Promise((resolve,reject)=>{
+    let i=0;
+    const next=()=>{
+      if(i>=cdns.length) return reject(new Error("All CDNs failed"));
+      const s=document.createElement("script");
+      s.src=cdns[i++]; s.async=true;
+      s.onload=()=>typeof Chart!=="undefined"?resolve():next();
+      s.onerror=next;
+      document.head.appendChild(s);
+    };
+    next();
+  });
+}
+
+/* ===== BOLLINGER ===== */
+function computeBB(rates,period,k){
+  const n=rates.length, upper=Array(n).fill(null), middle=Array(n).fill(null), lower=Array(n).fill(null);
+  if(n<period||period<2) return {upper,middle,lower};
+  let sum=0,sumSq=0;
+  for(let i=0;i<period;i++){sum+=rates[i]; sumSq+=rates[i]*rates[i];}
+  const fill=i=>{const m=sum/period; let v=sumSq/period-m*m; if(v<0)v=0; const sd=Math.sqrt(v); middle[i]=m; upper[i]=m+k*sd; lower[i]=m-k*sd;};
+  fill(period-1);
+  for(let j=period;j<n;j++){const o=rates[j-period],x=rates[j]; sum+=x-o; sumSq+=x*x-o*o; fill(j);}
+  return {upper,middle,lower};
+}
+
+/* ===== DOWNSAMPLE ===== */
+function downsample(values,target){
+  const n=values.length;
+  if(n<=target){const a=new Array(n); for(let i=0;i<n;i++)a[i]=i; return a;}
+  const out=[0], bs=(n-2)/(target-2); let a=0;
+  for(let i=0;i<target-2;i++){
+    const rs=Math.floor((i+1)*bs)+1, re=Math.min(n,Math.floor((i+2)*bs)+1);
+    let avgX=0,avgY=0; const cnt=Math.max(1,re-rs);
+    for(let k=rs;k<re;k++){avgX+=k; avgY+=values[k]||0;}
+    avgX/=cnt; avgY/=cnt;
+    const ws=Math.floor(i*bs)+1, we=Math.floor((i+1)*bs)+1, pay=values[a]||0;
+    let max=-1, nxt=ws;
+    for(let j=ws;j<we;j++){const area=Math.abs((a-avgX)*((values[j]||0)-pay)-(a-j)*(avgY-pay))*0.5; if(area>max){max=area; nxt=j;}}
+    out.push(nxt); a=nxt;
+  }
+  out.push(n-1); return out;
+}
+
+/* ===== CACHE ===== */
+const cKey=(src,id,r)=>`fxdash:${src}:${id}:${r}`;
+function cacheGet(k){
+  try{const r=sessionStorage.getItem(k); if(r){const o=JSON.parse(r); if(Date.now()-o.t<=CACHE_TTL_SS) return o.d; sessionStorage.removeItem(k);}}catch(e){}
+  try{const r=localStorage.getItem(k); if(r){const o=JSON.parse(r); if(Date.now()-o.t<=CACHE_TTL_LS) return o.d; localStorage.removeItem(k);}}catch(e){}
+  return null;
+}
+function cacheSet(k,d){
+  const p=JSON.stringify({t:Date.now(),d});
+  try{sessionStorage.setItem(k,p);}catch(e){}
+  try{localStorage.setItem(k,p);}catch(e){
+    try{for(let i=0;i<localStorage.length;i++){const kk=localStorage.key(i); if(kk&&kk.startsWith("fxdash:")){localStorage.removeItem(kk); break;}} localStorage.setItem(k,p);}catch(_){}
+  }
+}
+
+/* ===== FETCH ===== */
+function fetchT(url,ms=FETCH_TIMEOUT){
+  const c=new AbortController(), t=setTimeout(()=>c.abort(),ms);
+  return fetch(url,{signal:c.signal}).finally(()=>clearTimeout(t));
+}
+
+/* ----- Frankfurter (only for supported currencies) ----- */
+async function fetchFrankfurter(base,quote,range){
+  const now=new Date(), from=new Date(now-getFetchDays(range)*86400000);
+  const url=`https://api.frankfurter.dev/v1/${dateStr(from)}..${dateStr(now)}?base=${base}&symbols=${quote}`;
+  const r=await fetchT(url);
+  if(!r.ok) throw new Error("Frankfurter HTTP "+r.status);
+  const j=await r.json();
+  const dates=[],rates=[];
+  if(j&&j.rates){
+    for(const day of Object.keys(j.rates).sort()){
+      const v=j.rates[day][quote];
+      if(v!=null){dates.push(day); rates.push(v);}
+    }
+  }
+  if(!dates.length) throw new Error("Empty Frankfurter series");
+  return {dates,rates};
+}
+
+/* ----- FX with smart fallback to Yahoo ----- */
+async function fetchFX(base,quote,range){
+  const k=cKey("fx",base+quote,range), c=cacheGet(k);
+  if(c) return {data:c,fromCache:true};
+
+  const canUseFrankfurter = FRANKFURTER_CCY.has(base) && FRANKFURTER_CCY.has(quote);
+
+  // Try Frankfurter first if both currencies are in its set
+  if(canUseFrankfurter){
+    try{
+      const out = await fetchFrankfurter(base,quote,range);
+      cacheSet(k,out);
+      return {data:out,fromCache:false};
+    }catch(err){
+      console.warn(`Frankfurter failed for ${base}/${quote}, falling back to Yahoo:`, err.message);
+    }
+  }
+
+  // Fallback (or primary for unsupported pairs): Yahoo FX ticker like USDCOP=X
+  const yhTicker = `${base}${quote}=X`;
+  const yhRes = await fetchYahoo(yhTicker, range);   // this caches under yh:USDCOP=X
+  cacheSet(k, yhRes.data);                            // also cache under fx key
+  return {data:yhRes.data, fromCache:yhRes.fromCache};
+}
+
+/* ----- Yahoo (via CORS proxies) ----- */
+async function fetchYahoo(ticker,range){
+  const k=cKey("yh",ticker,range), c=cacheGet(k);
+  if(c) return {data:c,fromCache:true};
+  const spec=getRange(range), iv=spec.interval||"1d";
+  let qs;
+  if(range==="1D") qs=`?range=1d&interval=${iv}&includePrePost=false&events=`;
+  else {
+    const now=Math.floor(Date.now()/1000), from=now-Math.max(getFetchDays(range),2)*86400;
+    qs=`?period1=${from}&period2=${now}&interval=${iv}&includePrePost=false&events=`;
+  }
+  const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}${qs}`;
+  const proxies=[
+    "https://corsproxy.io/?"+encodeURIComponent(yUrl),
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(yUrl),
+    "https://api.codetabs.com/v1/proxy/?quest="+encodeURIComponent(yUrl)
+  ];
+  const intraday=/[mh]/.test(iv);
+  const tryOne=async u=>{
+    const r=await fetchT(u); if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    const res=j?.chart?.result?.[0]; if(!res) throw new Error("Bad payload");
+    const ts=res.timestamp||[], q=res.indicators?.quote?.[0], closes=q?.close||[];
+    const dates=[],rates=[];
+    for(let i=0;i<ts.length;i++){
+      if(closes[i]==null) continue;
+      const d=new Date(ts[i]*1000);
+      dates.push(intraday
+        ? `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`
+        : dateStr(d));
+      rates.push(Math.round(closes[i]*10000)/10000);
+    }
+    if(!dates.length) throw new Error("Empty Yahoo series");
+    return {dates,rates};
+  };
+  const out=await Promise.any(proxies.map(tryOne));
+  cacheSet(k,out);
+  return {data:out,fromCache:false};
+}
+
+/* ===== CONCURRENCY ===== */
+async function runWithLimit(tasks,limit){
+  let i=0;
+  const workers=Array.from({length:Math.min(limit,tasks.length)}, async()=>{
+    while(i<tasks.length){
+      const idx=i++;
+      try{ await tasks[idx](); } catch(e){ console.error(e); }
+    }
+  });
+  await Promise.all(workers);
+}
+
+/* ===== CHART CREATION ===== */
+function createChart(i,item){
+  const ctx=document.getElementById("chart_"+i);
+  const ds=(label,color,extra={})=>Object.assign({label,data:[],borderColor:color,backgroundColor:"transparent",borderWidth:1,borderDash:[4,3],fill:false,tension:0,pointRadius:0,pointHitRadius:6,hidden:!bbEnabled,order:2,spanGaps:true},extra);
+  return new Chart(ctx,{
+    type:"line",
+    data:{labels:[],datasets:[
+      ds("BB Upper",BB_UP,{backgroundColor:BB_FILL,fill:"+2"}),
+      ds("BB Middle (SMA)",BB_MD,{borderDash:[2,3]}),
+      ds("BB Lower",BB_LO),
+      {label:item.shortLabel,data:[],borderColor:item.color,backgroundColor:item.color+"22",borderWidth:2,fill:false,tension:0,pointRadius:0,pointHitRadius:10,order:1}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      devicePixelRatio:Math.min(window.devicePixelRatio||1,DPR_CAP),
+      animation:false, resizeDelay:120, normalized:true,
+      interaction:{intersect:false,mode:"index"},
+      plugins:{
+        legend:{display:false},
+        tooltip:{enabled:true,animation:false,
+          filter:c=>c.parsed.y!=null,
+          callbacks:{label:c=>`${c.dataset.label}: ${fmtRate(c.parsed.y)} ${item.unit}`}}
+      },
+      scales:{
+        x:{ticks:{color:"#aaa",maxTicksLimit:IS_MOBILE?6:10,font:{size:11},autoSkip:true},grid:{color:"#333",display:!IS_MOBILE}},
+        y:{ticks:{color:"#aaa",font:{size:11},maxTicksLimit:IS_MOBILE?5:8,
+            callback:v=>Math.abs(v)<10?(+v).toFixed(4):(+v).toLocaleString()},grid:{color:"#333"}}
+      }
+    }
+  });
+}
+
+/* ===== RENDER ===== */
+function renderChart(i){
+  const item=charts[i]; if(!item) return;
+  const rk=item.currentRange, raw=item.rangeCache[rk];
+  if(!raw?.dates?.length) return;
+  const cutoff=getCutoffStr(rk), label=getRange(rk).key, intraday=(rk==="1D");
+  const bb=computeBB(raw.rates,bbPeriod,bbStdev);
+
+  let dates,rates,up,mid,lo;
+  if(intraday && item.cfg.source==="yahoo"){
+    dates=raw.dates; rates=raw.rates; up=bb.upper; mid=bb.middle; lo=bb.lower;
+  } else {
+    dates=[]; rates=[]; up=[]; mid=[]; lo=[];
+    for(let j=0;j<raw.dates.length;j++){
+      if(raw.dates[j]>=cutoff){dates.push(raw.dates[j]);rates.push(raw.rates[j]);up.push(bb.upper[j]);mid.push(bb.middle[j]);lo.push(bb.lower[j]);}
+    }
+    if(!dates.length){dates=raw.dates;rates=raw.rates;up=bb.upper;mid=bb.middle;lo=bb.lower;}
+  }
+
+  let mn=Infinity,mx=-Infinity,sm=0;
+  for(const r of rates){if(r<mn)mn=r; if(r>mx)mx=r; sm+=r;}
+  const avg=sm/rates.length, first=rates[0], last=rates[rates.length-1];
+  const change=first?((last-first)/first)*100:0;
+
+  const idxs=downsample(rates,MAX_POINTS);
+  const pick=arr=>idxs.map(ix=>arr[ix]);
+  const ch=item.chart;
+  ch.data.labels=pick(dates);
+  ch.data.datasets[0].data=pick(up);
+  ch.data.datasets[1].data=pick(mid);
+  ch.data.datasets[2].data=pick(lo);
+  ch.data.datasets[3].data=pick(rates);
+  for(let d=0;d<3;d++) ch.data.datasets[d].hidden=!bbEnabled;
+  ch.update("none");
+
+  const $=id=>document.getElementById(id+"_"+i);
+  $("min").textContent=fmtRate(mn); $("max").textContent=fmtRate(mx); $("avg").textContent=fmtRate(avg);
+  $("min_lbl").textContent=label+" Low"; $("max_lbl").textContent=label+" High"; $("avg_lbl").textContent=label+" Avg";
+  const arrow=change>=0?"▲":"▼", cls=change>=0?"pos":"neg";
+  $("change").innerHTML=`<span class="${cls}"> ${arrow} ${Math.abs(change).toFixed(2)}% (${label})</span>`;
+  $("rate").textContent=`${fmtRate(last)} ${item.unit}`;
+  $("date").textContent=dates[dates.length-1];
+
+  const bbEl=$("bbinfo"), lU=up[up.length-1], lM=mid[mid.length-1], lL=lo[lo.length-1];
+  if(bbEl){
+    if(lU!=null && bbEnabled){
+      const pctB=lU!==lL?((last-lL)/(lU-lL))*100:50, width=lM?((lU-lL)/lM)*100:0;
+      bbEl.innerHTML=` · BB(${bbPeriod},${bbStdev}): <span style="color:${BB_LO}">${fmtRate(lL)}</span> / <span style="color:${BB_MD}">${fmtRate(lM)}</span> / <span style="color:${BB_UP}">${fmtRate(lU)}</span> <span style="color:var(--tx2)">(%B ${pctB.toFixed(0)}, width ${width.toFixed(2)}%)</span>`;
+    } else bbEl.textContent="";
+  }
+}
+
+/* ===== LOAD ONE RANGE ===== */
+async function loadRange(i,rk){
+  const item=charts[i]; if(!item) return;
+  const bar=document.getElementById("rangebar_"+i);
+  if(bar) bar.querySelectorAll(".rbtn").forEach(b=>b.classList.toggle("active",b.dataset.range===rk));
+  item.currentRange=rk;
+
+  if(item.rangeCache[rk]){ renderChart(i); return; }
+  if(item.loadingRange===rk) return;
+  item.loadingRange=rk;
+
+  const card=document.getElementById("card_"+i);
+  card?.classList.add("loading");
+  const btn=bar?.querySelector(`[data-range="${rk}"]`);
+  btn?.classList.add("loading");
+
+  try{
+    const res=item.cfg.source==="fx"
+      ? await fetchFX(item.cfg.base,item.cfg.quote,rk)
+      : await fetchYahoo(item.cfg.ticker,rk);
+    item.rangeCache[rk]={dates:res.data.dates,rates:res.data.rates};
+    if(card){card.classList.remove("loading","error"); card.classList.toggle("cached",res.fromCache);}
+    if(item.currentRange===rk) renderChart(i);
+  }catch(err){
+    console.error("Failed:",item.cfg.label,err);
+    card?.classList.remove("loading"); card?.classList.add("error");
+    const re=document.getElementById("rate_"+i); if(re) re.textContent="Failed to load";
+    throw err;
+  }finally{
+    item.loadingRange=null;
+    btn?.classList.remove("loading");
+  }
+}
+
+/* ===== BB CONTROLS ===== */
+function onBBChange(){
+  bbEnabled=document.getElementById("bbToggle").checked;
+  const p=parseInt(document.getElementById("bbPeriod").value,10);
+  const k=parseFloat(document.getElementById("bbStdev").value);
+  if(p>=2) bbPeriod=p;
+  if(k>0)  bbStdev=k;
+  charts.forEach((item,i)=>{ if(item.rangeCache[item.currentRange]) renderChart(i); });
+}
+
+/* ===== BUILD UI ===== */
+function buildCards(){
+  const grid=document.getElementById("chartGrid");
+  const rbtns=RANGES.map(r=>`<span class="rbtn${r.key===DEFAULT_RANGE?' active':''}" data-range="${r.key}">${r.key}</span>`).join("");
+  grid.innerHTML = CHARTS.map((cfg,i)=>(cfg.section?`<h3 class="section-title">${cfg.section}</h3>`:"")+`
+    <div class="card loading" id="card_${i}">
+      <h2>${cfg.label}</h2>
+      <div class="card-range-bar" id="rangebar_${i}" data-idx="${i}">${rbtns}</div>
+      <p class="current-rate">As of <strong id="date_${i}">loading…</strong>:
+        <span class="rate-value" id="rate_${i}">—</span>
+        <span id="change_${i}"></span>
+        <span id="bbinfo_${i}" style="font-size:11px"></span>
+      </p>
+      <div class="stats-row">
+        <div class="stat"><span class="stat-label" id="min_lbl_${i}">Low</span><span class="stat-value" id="min_${i}">—</span></div>
+        <div class="stat"><span class="stat-label" id="max_lbl_${i}">High</span><span class="stat-value" id="max_${i}">—</span></div>
+        <div class="stat"><span class="stat-label" id="avg_lbl_${i}">Avg</span><span class="stat-value" id="avg_${i}">—</span></div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart_${i}"></canvas></div>
+    </div>`).join("") + `<p class="footer">Click any range on a chart to load that period · Bollinger Bands: SMA ± Kσ</p>`;
+
+  grid.addEventListener("click",ev=>{
+    const btn=ev.target.closest?.(".rbtn"); if(!btn) return;
+    const bar=btn.closest(".card-range-bar"); if(!bar) return;
+    loadRange(+bar.dataset.idx, btn.dataset.range);
+  });
+}
+
+/* ===== BOOT ===== */
+async function boot(){
+  const now=new Date();
+  document.getElementById("genTime").textContent =
+    `Generated on ${now.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})} at ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}`;
+
+  try{ setStatus("Loading Chart.js…"); await loadChartJs(); }
+  catch(e){ setFatal("Could not load Chart.js from any CDN. Check your internet or ad-blocker."); console.error(e); return; }
+
+  buildCards();
+
+  CHARTS.forEach((cfg,i)=>{
+    let lbl=cfg.label; const dash=lbl.indexOf("—");
+    if(dash>0) lbl=lbl.substring(0,dash).trim(); else if(cfg.ticker) lbl=cfg.ticker;
+    const item={cfg, shortLabel:lbl, unit:cfg.unit, color:COLORS[i%COLORS.length],
+                currentRange:DEFAULT_RANGE, rangeCache:{}, loadingRange:null, chart:null};
+    charts.push(item);
+    try{ item.chart=createChart(i,item); }catch(e){ console.error("Chart create failed:",cfg.label,e); }
+  });
+
+  ["bbToggle","bbPeriod","bbStdev"].forEach(id=>document.getElementById(id).addEventListener("change",onBBChange));
+
+  setStatus(`Loading default ${DEFAULT_RANGE} snapshot…`);
+  let errors=0;
+  const mkTask = i => async () => {
+    try{ await loadRange(i,DEFAULT_RANGE); }
+    catch(e){ errors++; }
+    bumpProgress();
+    setStatus(`Loaded ${loadedCount}/${CHARTS.length}${errors?` (${errors} errors)`:""}…`);
+  };
+  const fxTasks=[], yhTasks=[];
+  CHARTS.forEach((cfg,i)=> (cfg.source==="fx"?fxTasks:yhTasks).push(mkTask(i)));
+
+  await Promise.all([runWithLimit(fxTasks,CONC_FX), runWithLimit(yhTasks,CONC_YH)]);
+  setStatus(`${DEFAULT_RANGE} snapshot loaded${errors?` (${errors} failed)`:""} · click any range on a chart to load more`, true);
+}
+
+document.addEventListener("DOMContentLoaded", boot);
+</script>
+</body>
+</html>
