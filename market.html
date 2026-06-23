@@ -1,0 +1,755 @@
+<script>
+/* ============ CONFIG ============ */
+const IS_MOBILE = matchMedia("(max-width:900px)").matches || /Mobi|Android/i.test(navigator.userAgent);
+const MAX_POINTS = IS_MOBILE ? 180 : 450;
+const DPR_CAP    = IS_MOBILE ? 1.5 : 2;
+
+/* More forgiving + less overload */
+const FETCH_TIMEOUT = 15000;
+const CACHE_TTL = 24 * 60 * 60 * 1000;      // fresh cache
+const STALE_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // stale fallback cache
+const CONCURRENCY = IS_MOBILE ? 2 : 2;
+const MAX_RETRIES = 2;
+
+/* ============ INSTRUMENTS ============ */
+/* Add alias tickers + noIntraday for Lima names */
+const CHARTS = [
+  {
+    section:"🌐 Exchange Rates",
+    ticker:"USDCOP=X",
+    tickers:["USDCOP=X","COP=X"],
+    label:"USD / COP — US Dollar to Colombian Peso",
+    unit:"COP"
+  },
+  {
+    ticker:"USDPEN=X",
+    tickers:["USDPEN=X","PEN=X"],
+    label:"USD / PEN — US Dollar to Peruvian Sol",
+    unit:"PEN"
+  },
+  { ticker:"USDJPY=X", tickers:["USDJPY=X"], label:"USD / JPY — US Dollar to Japanese Yen", unit:"JPY" },
+  { ticker:"GBPEUR=X", tickers:["GBPEUR=X"], label:"GBP / EUR — British Pound to Euro", unit:"EUR" },
+  { ticker:"EURUSD=X", tickers:["EURUSD=X"], label:"EUR / USD — Euro to US Dollar", unit:"USD" },
+
+  { section:"📊 Market Indices & Bonds", ticker:"^GSPC", tickers:["^GSPC"], label:"S&P 500 Index", unit:"pts" },
+  { ticker:"^IXIC", tickers:["^IXIC"], label:"NASDAQ Composite", unit:"pts" },
+  { ticker:"^VIX",  tickers:["^VIX"],  label:"CBOE Volatility Index (VIX)", unit:"pts" },
+  { ticker:"^TNX",  tickers:["^TNX"],  label:"US 10-Year Treasury Yield", unit:"%" },
+
+  {
+    section:"📈 Lima Stock Prices",
+    ticker:"VOLCABC1.LM",
+    tickers:["VOLCABC1.LM"],
+    label:"VOLCABC1.LM — Volcan Minera Class B",
+    unit:"PEN",
+    noIntraday:true
+  },
+  {
+    ticker:"CORAREI1.LM",
+    tickers:["CORAREI1.LM"],
+    label:"CORAREI1.LM — Corp. Aceros Arequipa",
+    unit:"PEN",
+    noIntraday:true
+  },
+
+  { section:"🤖 AI & Robotics ETFs", ticker:"QTUM", tickers:["QTUM"], label:"QTUM — Defiance Quantum ETF", unit:"USD" },
+  { ticker:"ROBO", tickers:["ROBO"], label:"ROBO — ROBO Global Robotics ETF", unit:"USD" },
+];
+
+const COLORS=["#4fc3f7","#66bb6a","#ffa726","#ec407a","#ab47bc","#26c6da","#ef5350","#fdd835","#78909c","#7e57c2","#29b6f6","#9ccc65","#ff7043"];
+
+const RANGES = [
+  {key:"1D",  range:"5d",  interval:"5m",  cutoffDays:1   },
+  {key:"10D", range:"1mo", interval:"1d",  cutoffDays:10  },
+  {key:"1M",  range:"3mo", interval:"1d",  cutoffDays:30  },
+  {key:"1Y",  range:"2y",  interval:"1wk", cutoffDays:365 },
+  {key:"10Y", range:"10y", interval:"1wk", cutoffDays:3650},
+];
+const DEFAULT_RANGE = "1M";
+
+const BB_UP="#ef5350", BB_LO="#66bb6a", BB_MD="#ffa726", BB_FILL="rgba(255,167,38,0.08)";
+
+/* Direct first, proxies later */
+const YAHOO_BASES = [
+  "https://query1.finance.yahoo.com/v8/finance/chart/",
+  "https://query2.finance.yahoo.com/v8/finance/chart/"
+];
+
+const PROXIES = [
+  { name:"direct", build:u => u, priority:0 },
+  { name:"corsproxy", build:u => "https://corsproxy.io/?url=" + encodeURIComponent(u), priority:1 },
+  { name:"allorigins", build:u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u), priority:2 },
+  { name:"codetabs", build:u => "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u), priority:3 },
+  { name:"corseu", build:u => "https://cors.eu.org/" + u, priority:4 },
+];
+
+const proxyHealth = new Map(PROXIES.map(p => [p.name, {ok:0, fail:0, last:0}]));
+
+/* ============ STATE ============ */
+const charts=[];
+let bbEnabled=true, bbPeriod=20, bbStdev=2, loadedCount=0;
+
+/* ============ HELPERS ============ */
+const pad2 = n => String(n).padStart(2,"0");
+const dateStr = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const fmtRate = v => v==null||isNaN(v) ? "—" : (Math.abs(v)<10 ? (+v).toFixed(4) : (+v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}));
+const getRange = k => RANGES.find(r=>r.key===k) || RANGES[0];
+const getCutoffStr = k => {
+  const r=getRange(k);
+  return dateStr(new Date(Date.now()-r.cutoffDays*86400000));
+};
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+const setStatus = (m,done) => {
+  document.getElementById("statusText").textContent=m;
+  if(done){
+    const s=document.getElementById("spinner");
+    if(s) s.outerHTML='<span style="color:var(--gn);font-size:16px">✓</span>';
+  }
+};
+
+const setFatal = m => {
+  document.getElementById("statusText").innerHTML=`<span class="fatal">${m}</span>`;
+  const s=document.getElementById("spinner");
+  if(s) s.style.display="none";
+};
+
+const bumpProgress = () => {
+  loadedCount++;
+  document.getElementById("progressBar").style.width = Math.round(loadedCount/CHARTS.length*100) + "%";
+};
+
+function markProxy(name, ok){
+  const x = proxyHealth.get(name);
+  if(!x) return;
+  x.last = Date.now();
+  if(ok) x.ok++;
+  else x.fail++;
+}
+
+function proxyOrder(){
+  return [...PROXIES].sort((a,b) => {
+    const ha = proxyHealth.get(a.name) || {ok:0,fail:0};
+    const hb = proxyHealth.get(b.name) || {ok:0,fail:0};
+    const sa = (ha.fail * 3) - ha.ok + a.priority;
+    const sb = (hb.fail * 3) - hb.ok + b.priority;
+    return sa - sb;
+  });
+}
+
+function getEffectiveSpec(cfg, rangeKey){
+  const spec = {...getRange(rangeKey)};
+
+  /* Lima stocks often fail on intraday — downgrade 1D to safe daily fallback */
+  if(cfg.noIntraday && rangeKey === "1D"){
+    return { key:"1D", range:"1mo", interval:"1d", cutoffDays:7, syntheticIntraday:true };
+  }
+
+  return spec;
+}
+
+function buildYahooUrls(ticker, spec){
+  const nowSec = Math.floor(Date.now()/1000);
+  const day = 86400;
+
+  const approxStart = (() => {
+    if(spec.key === "1D")  return nowSec - 7*day;
+    if(spec.key === "10D") return nowSec - 40*day;
+    if(spec.key === "1M")  return nowSec - 120*day;
+    if(spec.key === "1Y")  return nowSec - 3*365*day;
+    if(spec.key === "10Y") return nowSec - 11*365*day;
+    return nowSec - 180*day;
+  })();
+
+  return YAHOO_BASES.flatMap(base => {
+    const root = `${base}${encodeURIComponent(ticker)}`;
+    return [
+      /* IMPORTANT: real & — not &amp; */
+      `${root}?range=${spec.range}&interval=${spec.interval}&includePrePost=false&events=div,splits`,
+      `${root}?period1=${approxStart}&period2=${nowSec}&interval=${spec.interval}&includePrePost=false&events=div,splits`
+    ];
+  });
+}
+
+/* ============ CHART.JS LOADER ============ */
+function loadChartJs(){
+  if(typeof Chart!=="undefined") return Promise.resolve();
+  const cdns=[
+    "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js",
+    "https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.7/chart.umd.min.js"
+  ];
+  return new Promise((resolve,reject)=>{
+    let i=0;
+    const next=()=>{
+      if(i>=cdns.length) return reject(new Error("All CDNs failed"));
+      const s=document.createElement("script");
+      s.src=cdns[i++];
+      s.async=true;
+      s.onload=()=> typeof Chart!=="undefined" ? resolve() : next();
+      s.onerror=next;
+      document.head.appendChild(s);
+    };
+    next();
+  });
+}
+
+/* ============ BOLLINGER ============ */
+function computeBB(rates,period,k){
+  const n=rates.length, upper=Array(n).fill(null), middle=Array(n).fill(null), lower=Array(n).fill(null);
+  if(n<period||period<2) return {upper,middle,lower};
+  let sum=0,sumSq=0;
+  for(let i=0;i<period;i++){sum+=rates[i]; sumSq+=rates[i]*rates[i];}
+  const fill=i=>{
+    const m=sum/period;
+    let v=sumSq/period-m*m;
+    if(v<0) v=0;
+    const sd=Math.sqrt(v);
+    middle[i]=m;
+    upper[i]=m+k*sd;
+    lower[i]=m-k*sd;
+  };
+  fill(period-1);
+  for(let j=period;j<n;j++){
+    const o=rates[j-period], x=rates[j];
+    sum+=x-o;
+    sumSq+=x*x-o*o;
+    fill(j);
+  }
+  return {upper,middle,lower};
+}
+
+/* ============ LTTB DOWNSAMPLE ============ */
+function downsample(values,target){
+  const n=values.length;
+  if(n<=target){
+    const a=new Array(n);
+    for(let i=0;i<n;i++) a[i]=i;
+    return a;
+  }
+  const out=[0], bs=(n-2)/(target-2);
+  let a=0;
+  for(let i=0;i<target-2;i++){
+    const rs=Math.floor((i+1)*bs)+1, re=Math.min(n,Math.floor((i+2)*bs)+1);
+    let avgX=0, avgY=0;
+    const cnt=Math.max(1,re-rs);
+    for(let k=rs;k<re;k++){avgX+=k; avgY+=values[k]||0;}
+    avgX/=cnt; avgY/=cnt;
+
+    const ws=Math.floor(i*bs)+1, we=Math.floor((i+1)*bs)+1;
+    const pay=values[a]||0;
+    let max=-1, nxt=ws;
+    for(let j=ws;j<we;j++){
+      const area=Math.abs((a-avgX)*((values[j]||0)-pay)-(a-j)*(avgY-pay))*0.5;
+      if(area>max){max=area; nxt=j;}
+    }
+    out.push(nxt); a=nxt;
+  }
+  out.push(n-1);
+  return out;
+}
+
+/* ============ CACHE ============ */
+const cKey = (ticker,range) => `fxdash:${ticker}:${range}`;
+const staleKey = (ticker,range) => `fxdash-stale:${ticker}:${range}`;
+
+function cacheGet(k){
+  try{
+    const r=localStorage.getItem(k);
+    if(r){
+      const o=JSON.parse(r);
+      if(Date.now()-o.t<=CACHE_TTL) return o.d;
+      localStorage.removeItem(k);
+    }
+  }catch(e){}
+  return null;
+}
+
+function staleCacheGet(k){
+  try{
+    const r=localStorage.getItem(k);
+    if(r){
+      const o=JSON.parse(r);
+      if(Date.now()-o.t<=STALE_CACHE_TTL) return o.d;
+      localStorage.removeItem(k);
+    }
+  }catch(e){}
+  return null;
+}
+
+function cacheSet(k,d){
+  const p=JSON.stringify({t:Date.now(),d});
+  try{
+    localStorage.setItem(k,p);
+  }catch(e){
+    try{
+      const keys=[];
+      for(let i=0;i<localStorage.length;i++){
+        const kk=localStorage.key(i);
+        if(kk && kk.startsWith("fxdash:")) keys.push(kk);
+      }
+      keys.slice(0,Math.ceil(keys.length/4)).forEach(kk=>localStorage.removeItem(kk));
+      localStorage.setItem(k,p);
+    }catch(_){}
+  }
+}
+
+function saveFreshAndStale(ticker, rangeKey, data){
+  cacheSet(cKey(ticker, rangeKey), data);
+  cacheSet(staleKey(ticker, rangeKey), data);
+}
+
+/* ============ FETCH LAYER ============ */
+function fetchT(url, ms=FETCH_TIMEOUT){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(),ms);
+  return fetch(url,{
+    signal:c.signal,
+    cache:"no-store",
+    headers:{
+      "Accept":"application/json, text/plain, */*"
+    }
+  }).finally(()=>clearTimeout(t));
+}
+
+function normalizeProxyJsonText(text){
+  if(text == null) throw new Error("Empty response text");
+  let s = String(text).trim();
+  if(!s) throw new Error("Blank response text");
+
+  /* direct JSON */
+  if(s[0] === "{") return s;
+  if(s[0] === "[") return s;
+
+  /* quoted JSON string payload */
+  if(s[0] === '"' && s.includes('\\"chart\\"')){
+    try{
+      return JSON.parse(s);
+    }catch(e){}
+  }
+
+  /* strip accidental HTML wrapper or prefix/suffix */
+  const start = s.indexOf('{"chart"');
+  if(start >= 0){
+    const end = s.lastIndexOf("}");
+    if(end > start) return s.slice(start, end + 1);
+  }
+
+  throw new Error("Proxy returned non-JSON payload");
+}
+
+function parseYahooChartJson(j, spec){
+  if(j?.chart?.error) throw new Error("Yahoo error: " + (j.chart.error.description || JSON.stringify(j.chart.error)));
+  const res = j?.chart?.result?.[0];
+  if(!res) throw new Error("Bad payload (no result)");
+
+  const ts = res.timestamp || [];
+  const quote = res.indicators?.quote?.[0] || {};
+  const closes = quote.close || [];
+  const adj = res.indicators?.adjclose?.[0]?.adjclose || [];
+  const use = closes.some(v => v != null) ? closes : adj;
+
+  const intraday = /[mh]/.test(spec.interval);
+  const dates=[], rates=[];
+  for(let i=0;i<ts.length;i++){
+    const v = use[i];
+    if(v == null || !isFinite(v)) continue;
+    const d = new Date(ts[i]*1000);
+    dates.push(
+      intraday
+        ? `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`
+        : dateStr(d)
+    );
+    rates.push(Math.round(v*10000)/10000);
+  }
+
+  if(!dates.length) throw new Error("Empty series");
+  return {dates, rates};
+}
+
+async function tryOnePath(fullUrl, proxy, spec){
+  const proxiedUrl = proxy.build(fullUrl);
+  const r = await fetchT(proxiedUrl);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+
+  const text = await r.text();
+  const clean = normalizeProxyJsonText(text);
+  const json = JSON.parse(clean);
+  return parseYahooChartJson(json, spec);
+}
+
+async function fetchYahoo(cfg, rangeKey){
+  const primaryKey = cKey(cfg.ticker, rangeKey);
+  const fresh = cacheGet(primaryKey);
+  if(fresh) return {data:fresh, fromCache:true};
+
+  const spec = getEffectiveSpec(cfg, rangeKey);
+
+  const tickers = cfg.tickers && cfg.tickers.length ? cfg.tickers : [cfg.ticker];
+
+  let errors = [];
+
+  for(const ticker of tickers){
+    const urls = buildYahooUrls(ticker, spec);
+
+    for(let retry=0; retry<=MAX_RETRIES; retry++){
+      for(const url of urls){
+        for(const proxy of proxyOrder()){
+          try{
+            const data = await tryOnePath(url, proxy, spec);
+            markProxy(proxy.name, true);
+            saveFreshAndStale(cfg.ticker, rangeKey, data);
+            return {data, fromCache:false, usedTicker:ticker, usedProxy:proxy.name};
+          }catch(err){
+            markProxy(proxy.name, false);
+            errors.push(`[${ticker}] [${proxy.name}] ${err.message}`);
+          }
+        }
+      }
+
+      if(retry < MAX_RETRIES){
+        await sleep(350 * (retry + 1));
+      }
+    }
+  }
+
+  /* stale cache fallback */
+  const stale = staleCacheGet(staleKey(cfg.ticker, rangeKey));
+  if(stale){
+    return {data:stale, fromCache:true, stale:true};
+  }
+
+  throw new Error("All data paths failed: " + errors.slice(-12).join(" | "));
+}
+
+/* ============ CONCURRENCY POOL ============ */
+async function runWithLimit(tasks, limit){
+  let i=0;
+  const workers = Array.from({length:Math.min(limit, tasks.length)}, async ()=>{
+    while(i < tasks.length){
+      const idx = i++;
+      try{ await tasks[idx](); }catch(e){ console.error(e); }
+    }
+  });
+  await Promise.all(workers);
+}
+
+/* ============ CHART CREATION ============ */
+function createChart(i, item){
+  const ctx = document.getElementById("chart_"+i);
+  const ds = (label, color, extra={}) => Object.assign({
+    label, data:[], borderColor:color, backgroundColor:"transparent",
+    borderWidth:1, borderDash:[4,3], fill:false, tension:0,
+    pointRadius:0, pointHitRadius:6, hidden:!bbEnabled, order:2, spanGaps:true
+  }, extra);
+
+  return new Chart(ctx, {
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[
+        ds("BB Upper", BB_UP, {backgroundColor:BB_FILL, fill:"+2"}),
+        ds("BB Middle (SMA)", BB_MD, {borderDash:[2,3]}),
+        ds("BB Lower", BB_LO),
+        {
+          label:item.shortLabel,
+          data:[],
+          borderColor:item.color,
+          backgroundColor:item.color+"22",
+          borderWidth:2,
+          fill:false,
+          tension:0,
+          pointRadius:0,
+          pointHitRadius:10,
+          order:1
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      devicePixelRatio:Math.min(window.devicePixelRatio||1, DPR_CAP),
+      animation:false,
+      resizeDelay:120,
+      normalized:true,
+      interaction:{intersect:false, mode:"index"},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          enabled:true,
+          animation:false,
+          filter:c=>c.parsed.y!=null,
+          callbacks:{
+            label:c=>`${c.dataset.label}: ${fmtRate(c.parsed.y)} ${item.unit}`
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{color:"#aaa", maxTicksLimit:IS_MOBILE?6:10, font:{size:11}, autoSkip:true},
+          grid:{color:"#333", display:!IS_MOBILE}
+        },
+        y:{
+          ticks:{
+            color:"#aaa",
+            font:{size:11},
+            maxTicksLimit:IS_MOBILE?5:8,
+            callback:v=>Math.abs(v)<10?(+v).toFixed(4):(+v).toLocaleString()
+          },
+          grid:{color:"#333"}
+        }
+      }
+    }
+  });
+}
+
+/* ============ RENDER ============ */
+function renderChart(i){
+  const item = charts[i];
+  if(!item) return;
+
+  const rk = item.currentRange;
+  const raw = item.rangeCache[rk];
+  if(!raw?.dates?.length) return;
+
+  const cutoff = getCutoffStr(rk);
+  const label = rk;
+  const intraday = (rk==="1D" && !item.cfg.noIntraday);
+  const bb = computeBB(raw.rates, bbPeriod, bbStdev);
+
+  let dates, rates, up, mid, lo;
+  if(intraday){
+    dates=raw.dates; rates=raw.rates; up=bb.upper; mid=bb.middle; lo=bb.lower;
+  } else {
+    dates=[]; rates=[]; up=[]; mid=[]; lo=[];
+    for(let j=0;j<raw.dates.length;j++){
+      if(raw.dates[j] >= cutoff){
+        dates.push(raw.dates[j]);
+        rates.push(raw.rates[j]);
+        up.push(bb.upper[j]);
+        mid.push(bb.middle[j]);
+        lo.push(bb.lower[j]);
+      }
+    }
+    if(!dates.length){
+      dates=raw.dates; rates=raw.rates; up=bb.upper; mid=bb.middle; lo=bb.lower;
+    }
+  }
+
+  let mn=Infinity,mx=-Infinity,sm=0;
+  for(const r of rates){ if(r<mn) mn=r; if(r>mx) mx=r; sm+=r; }
+  const avg = sm/rates.length;
+  const first = rates[0];
+  const last = rates[rates.length-1];
+  const change = first ? ((last-first)/first)*100 : 0;
+
+  const idxs = downsample(rates, MAX_POINTS);
+  const pick = arr => idxs.map(ix => arr[ix]);
+
+  const ch = item.chart;
+  ch.data.labels = pick(dates);
+  ch.data.datasets[0].data = pick(up);
+  ch.data.datasets[1].data = pick(mid);
+  ch.data.datasets[2].data = pick(lo);
+  ch.data.datasets[3].data = pick(rates);
+  for(let d=0;d<3;d++) ch.data.datasets[d].hidden=!bbEnabled;
+  ch.update("none");
+
+  const $ = id => document.getElementById(id+"_"+i);
+  $("min").textContent = fmtRate(mn);
+  $("max").textContent = fmtRate(mx);
+  $("avg").textContent = fmtRate(avg);
+  $("min_lbl").textContent = label+" Low";
+  $("max_lbl").textContent = label+" High";
+  $("avg_lbl").textContent = label+" Avg";
+
+  const arrow = change>=0 ? "▲":"▼";
+  const cls = change>=0 ? "pos":"neg";
+  $("change").innerHTML = `<span class="${cls}"> ${arrow} ${Math.abs(change).toFixed(2)}% (${label})</span>`;
+  $("rate").textContent = `${fmtRate(last)} ${item.unit}`;
+  $("date").textContent = dates[dates.length-1];
+
+  const bbEl = $("bbinfo");
+  const lU=up[up.length-1], lM=mid[mid.length-1], lL=lo[lo.length-1];
+  if(bbEl){
+    if(lU!=null && bbEnabled){
+      const pctB = lU!==lL ? ((last-lL)/(lU-lL))*100 : 50;
+      const width = lM ? ((lU-lL)/lM)*100 : 0;
+      bbEl.innerHTML =
+        ` · BB(${bbPeriod},${bbStdev}): ` +
+        `<span style="color:${BB_LO}">${fmtRate(lL)}</span> / ` +
+        `<span style="color:${BB_MD}">${fmtRate(lM)}</span> / ` +
+        `<span style="color:${BB_UP}">${fmtRate(lU)}</span> ` +
+        `<span style="color:var(--tx2)">(%B ${pctB.toFixed(0)}, width ${width.toFixed(2)}%)</span>`;
+    } else {
+      bbEl.textContent="";
+    }
+  }
+}
+
+/* ============ LOAD ONE RANGE ============ */
+async function loadRange(i, rk){
+  const item = charts[i];
+  if(!item) return;
+
+  const bar = document.getElementById("rangebar_"+i);
+  if(bar) bar.querySelectorAll(".rbtn").forEach(b=>b.classList.toggle("active", b.dataset.range===rk));
+  item.currentRange = rk;
+
+  if(item.rangeCache[rk]){
+    renderChart(i);
+    return;
+  }
+  if(item.loadingRange===rk) return;
+  item.loadingRange = rk;
+
+  const card = document.getElementById("card_"+i);
+  card?.classList.remove("error");
+  card?.classList.add("loading");
+  const btn = bar?.querySelector(`[data-range="${rk}"]`);
+  btn?.classList.add("loading");
+
+  try{
+    const res = await fetchYahoo(item.cfg, rk);
+    item.rangeCache[rk] = res.data;
+
+    if(card){
+      card.classList.remove("loading","error");
+      card.classList.toggle("cached", !!res.fromCache);
+    }
+
+    if(item.currentRange===rk) renderChart(i);
+  }catch(err){
+    console.error("Failed:", item.cfg.label, err);
+    card?.classList.remove("loading");
+    card?.classList.add("error");
+    const re = document.getElementById("rate_"+i);
+    const dt = document.getElementById("date_"+i);
+    if(re) re.textContent = "Failed to load — click Retry";
+    if(dt) dt.textContent = "No data";
+  }finally{
+    item.loadingRange = null;
+    btn?.classList.remove("loading");
+  }
+}
+
+/* ============ BB CONTROLS ============ */
+function onBBChange(){
+  bbEnabled = document.getElementById("bbToggle").checked;
+  const p = parseInt(document.getElementById("bbPeriod").value,10);
+  const k = parseFloat(document.getElementById("bbStdev").value);
+  if(p>=2) bbPeriod=p;
+  if(k>0) bbStdev=k;
+  charts.forEach((item,i)=>{
+    if(item.rangeCache[item.currentRange]) renderChart(i);
+  });
+}
+
+/* ============ BUILD UI ============ */
+function buildCards(){
+  const grid = document.getElementById("chartGrid");
+  const rbtns = RANGES.map(r=>`<span class="rbtn${r.key===DEFAULT_RANGE?' active':''}" data-range="${r.key}">${r.key}</span>`).join("");
+
+  grid.innerHTML = CHARTS.map((cfg,i)=>(cfg.section?`<h3 class="section-title">${cfg.section}</h3>`:"")+`
+    <div class="card loading" id="card_${i}">
+      <h2>${cfg.label}</h2>
+      <div class="card-range-bar" id="rangebar_${i}" data-idx="${i}">
+        ${rbtns}
+        <button class="retry-btn" data-retry="${i}">↻ Retry</button>
+      </div>
+      <p class="current-rate">As of <strong id="date_${i}">loading…</strong>:
+        <span class="rate-value" id="rate_${i}">—</span>
+        <span id="change_${i}"></span>
+        <span id="bbinfo_${i}" style="font-size:11px"></span>
+      </p>
+      <div class="stats-row">
+        <div class="stat"><span class="stat-label" id="min_lbl_${i}">Low</span><span class="stat-value" id="min_${i}">—</span></div>
+        <div class="stat"><span class="stat-label" id="max_lbl_${i}">High</span><span class="stat-value" id="max_${i}">—</span></div>
+        <div class="stat"><span class="stat-label" id="avg_lbl_${i}">Avg</span><span class="stat-value" id="avg_${i}">—</span></div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart_${i}"></canvas></div>
+    </div>`).join("") +
+    `<p class="footer">Click any range on a chart to load that period · Bollinger Bands: SMA ± Kσ · Data: Yahoo Finance via direct/proxy fallback</p>`;
+
+  grid.addEventListener("click", ev => {
+    const retry = ev.target.closest?.("[data-retry]");
+    if(retry){
+      const i = +retry.dataset.retry;
+      const item = charts[i];
+      if(item){
+        delete item.rangeCache[item.currentRange];
+        loadRange(i, item.currentRange);
+      }
+      return;
+    }
+
+    const btn = ev.target.closest?.(".rbtn");
+    if(!btn) return;
+
+    const bar = btn.closest(".card-range-bar");
+    if(!bar) return;
+
+    loadRange(+bar.dataset.idx, btn.dataset.range);
+  });
+}
+
+/* ============ BOOT ============ */
+async function boot(){
+  const now = new Date();
+  document.getElementById("genTime").textContent =
+    `Generated on ${now.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})} at ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}`;
+
+  try{
+    setStatus("Loading Chart.js…");
+    await loadChartJs();
+  }catch(e){
+    setFatal("Could not load Chart.js from any CDN.");
+    console.error(e);
+    return;
+  }
+
+  buildCards();
+
+  CHARTS.forEach((cfg,i)=>{
+    let lbl=cfg.label;
+    const dash=lbl.indexOf("—");
+    if(dash>0) lbl=lbl.substring(0,dash).trim();
+    else if(cfg.ticker) lbl=cfg.ticker;
+
+    const item = {
+      cfg,
+      shortLabel:lbl,
+      unit:cfg.unit,
+      color:COLORS[i%COLORS.length],
+      currentRange:DEFAULT_RANGE,
+      rangeCache:{},
+      loadingRange:null,
+      chart:null
+    };
+    charts.push(item);
+
+    try{
+      item.chart = createChart(i,item);
+    }catch(e){
+      console.error("Chart create failed:", cfg.label, e);
+    }
+  });
+
+  ["bbToggle","bbPeriod","bbStdev"].forEach(id =>
+    document.getElementById(id).addEventListener("change", onBBChange)
+  );
+
+  setStatus(`Loading default ${DEFAULT_RANGE} snapshot…`);
+
+  const tasks = CHARTS.map((_,i)=> async ()=>{
+    await loadRange(i, DEFAULT_RANGE);
+    bumpProgress();
+    setStatus(`Loaded ${loadedCount}/${CHARTS.length}…`);
+  });
+
+  await runWithLimit(tasks, CONCURRENCY);
+  setStatus(`${DEFAULT_RANGE} snapshot loaded · click any range to load more`, true);
+}
+
+document.addEventListener("DOMContentLoaded", boot);
+</script>
