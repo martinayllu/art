@@ -257,6 +257,7 @@
             break-inside: avoid;
             margin: 0 0 60px;
             cursor: zoom-in;
+            position: relative;
         }
 
         .shot img {
@@ -274,6 +275,24 @@
             opacity: 1;
             transform: translateY(-2px);
         }
+
+        /* Small external-link badge shown only on shots that have a link */
+        .shot .ext-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            padding: 6px 8px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .shot:hover .ext-link { opacity: 1; }
 
         .gallery-panel { display: none; }
         .gallery-panel.active { display: block; }
@@ -355,6 +374,20 @@
             transition: background 0.2s ease, opacity 0.2s ease;
         }
         .lb-close:hover { background: rgba(255,255,255,0.06); }
+
+        .lb-open-link {
+            border: 1px solid #a88f5d;
+            background: rgba(0,0,0,0.35);
+            color: #a88f5d;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .lb-open-link:hover { background-color: #a88f5d; color: #000000; }
+        .lb-open-link.hidden { display: none; }
 
         /* ========================================
            COMMISSIONS / AVAILABILITY CTA
@@ -535,6 +568,7 @@
     ======================================== -->
     <div class="lightbox" id="lightbox" aria-hidden="true">
         <div class="lb-top">
+            <a class="lb-open-link hidden" id="lbOpenLink" href="#" target="_blank" rel="noopener">View Link</a>
             <button class="lb-close" id="lbClose" type="button">Close</button>
         </div>
         <div class="lightbox-inner" role="dialog" aria-modal="true" aria-label="Image viewer">
@@ -607,8 +641,18 @@
                     "Gallery2_13.jpg","Gallery2_14.jpg","Gallery2_15.jpg","Gallery2_16.jpg",
                     "Gallery2_17.jpg","Gallery2_18.jpg"
                 ]
+            },
+            {
+                id: "published-books",
+                tabLabel: "Published Books",
+                title: "Published Books",
+                meta: "211 aCD | 2 Books",
+                description: "Published Books.",
+                images: [
+                    { src: "Gallery3_2.jpeg", link: "https://www.lulu.com/shop/martin-cueva/america-latina/hardcover/product-m6wkyj.html?page=1&pageSize=4" },
+                    { src: "Gallery3_1.jpeg", link: null }
+                ]
             }
-            // To add Gallery3, append: { id: "...", tabLabel: "...", title: "...", meta: "...", description: "...", images: [...] }
         ];
 
         /* ========================================================================
@@ -627,6 +671,12 @@
         const lbClose = document.getElementById("lbClose");
         const lbPrev = document.getElementById("lbPrev");
         const lbNext = document.getElementById("lbNext");
+        const lbOpenLink = document.getElementById("lbOpenLink");
+
+        // Images may be a plain filename string (Gallery1/2 style) or an
+        // object { src, link } (Gallery3 style, for images that open a URL).
+        function getSrc(item) { return typeof item === "string" ? item : item.src; }
+        function getLink(item) { return typeof item === "string" ? null : item.link; }
 
         function renderTabs() {
             tabsEl.innerHTML = "";
@@ -661,16 +711,24 @@
                 const masonry = document.createElement("div");
                 masonry.className = "masonry";
 
-                g.images.forEach((src, idx) => {
+                g.images.forEach((item, idx) => {
                     const shot = document.createElement("div");
                     shot.className = "shot";
 
                     const img = document.createElement("img");
-                    img.src = src;
+                    img.src = getSrc(item);
                     img.alt = `${g.title} ${String(idx + 1).padStart(2, "0")}`;
                     img.loading = "lazy";
 
                     shot.appendChild(img);
+
+                    if (getLink(item)) {
+                        const badge = document.createElement("span");
+                        badge.className = "ext-link";
+                        badge.textContent = "Link ↗";
+                        shot.appendChild(badge);
+                    }
+
                     shot.addEventListener("click", () => openLightbox(g.id, idx));
 
                     masonry.appendChild(shot);
@@ -691,12 +749,27 @@
             });
         }
 
+        let currentGalleryTitle = "";
+
+        function updateLightboxLink() {
+            const link = getLink(currentImages[currentIndex]);
+            if (link) {
+                lbOpenLink.href = link;
+                lbOpenLink.classList.remove("hidden");
+            } else {
+                lbOpenLink.removeAttribute("href");
+                lbOpenLink.classList.add("hidden");
+            }
+        }
+
         function openLightbox(galleryId, idx) {
             const g = GALLERIES.find((x) => x.id === galleryId);
             currentImages = g.images;
+            currentGalleryTitle = g.title;
             currentIndex = idx;
-            lbImg.src = currentImages[currentIndex];
+            lbImg.src = getSrc(currentImages[currentIndex]);
             lbImg.alt = `${g.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
 
             lightboxEl.classList.add("active");
             lightboxEl.setAttribute("aria-hidden", "false");
@@ -713,13 +786,17 @@
         function showPrev() {
             if (!currentImages.length) return;
             currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
-            lbImg.src = currentImages[currentIndex];
+            lbImg.src = getSrc(currentImages[currentIndex]);
+            lbImg.alt = `${currentGalleryTitle} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
         }
 
         function showNext() {
             if (!currentImages.length) return;
             currentIndex = (currentIndex + 1) % currentImages.length;
-            lbImg.src = currentImages[currentIndex];
+            lbImg.src = getSrc(currentImages[currentIndex]);
+            lbImg.alt = `${currentGalleryTitle} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
         }
 
         function toggleMenu() {
@@ -730,6 +807,7 @@
         lbClose.addEventListener("click", closeLightbox);
         lbPrev.addEventListener("click", showPrev);
         lbNext.addEventListener("click", showNext);
+        lbOpenLink.addEventListener("click", (e) => e.stopPropagation());
 
         lightboxEl.addEventListener("click", (e) => {
             if (e.target === lightboxEl) closeLightbox();
