@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fine Art & Commission Photography | Martin Cueva</title>
+
+  <style>
+    /* ========================================
+       GLOBAL STYLES & TYPOGRAPHY
+       Aligned with premium home page design guidelines
+    ======================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    h1, h2, h3, .brand-title {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-weight: 300;
+    }
+
+    /* ========================================
+       NAVIGATION
+    ======================================== */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background-color: rgba(0,0,0,0.95);
+      padding: 25px 0;
+      z-index: 1000;
+      border-bottom: 1px solid #111;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .logo {
+      font-size: 22px;
+      letter-spacing: 4px;
+      color: #ffffff;
+      text-transform: uppercase;
+      transition: opacity 0.3s ease;
+    }
+    .logo:hover { opacity: 0.7; }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 35px;
+      align-items: center;
+    }
+
+    nav ul li a {
+      color: #ffffff;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 400;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    nav ul li a.active { color: #cccccc; }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: #ffffff;
+      transition: width 0.3s ease;
+    }
+
+    nav ul li a:hover::after,
+    nav ul li a.active::after {
+      width: 100%;
+    }
+
+    nav ul li a.cta-nav {
+        color: #a88f5d;
+    }
+    nav ul li a.cta-nav::after {
+        background-color: #a88f5d;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 6px;
+    }
+
+    .menu-toggle span {
+      width: 28px;
+      height: 2px;
+      background-color: #ffffff;
+      transition: all 0.3s ease;
+    }
+
+    /* ========================================
+       PORTFOLIO HEADER
+    ======================================== */
+    .series-header {
+      margin-top: 140px;
+      padding: 100px 40px 30px;
+      text-align: center;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .series-header h1 {
+      font-size: 52px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+
+    .series-submeta {
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 25px;
+    }
+
+    .series-header p {
+      font-size: 14px;
+      color: #999;
+      letter-spacing: 2px;
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* ========================================
+       COMMERCIAL CALL-TO-ACTION BANNER
+    ======================================== */
+    .commission-banner {
+      max-width: 1320px;
+      margin: 40px auto 20px auto;
+      padding: 30px 40px;
+      background-color: #050505;
+      border: 1px solid #111;
+      text-align: center;
+    }
+
+    .commission-banner p {
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .commission-banner a {
+      color: #a88f5d;
+      font-weight: bold;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s ease;
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    .commission-banner a:hover {
+      border-color: #a88f5d;
+    }
+
+    /* ========================================
+       GALLERY MASONRY FLOW
+    ======================================== */
+    .gallery-wrap {
+      max-width: 1400px;
+      margin: 20px auto 0;
+      padding: 0 40px;
+    }
+
+    .masonry {
+      column-count: 2;
+      column-gap: 40px;
+    }
+
+    .shot {
+      break-inside: avoid;
+      margin: 0 0 40px;
+      cursor: zoom-in;
+      border: 1px solid #0f0f0f;
+      padding: 10px;
+      background-color: #050505;
+      transition: border-color 0.3s ease;
+    }
+
+    .shot:hover {
+      border-color: #222;
+    }
+
+    .shot img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #111;
+      opacity: 0.85;
+      transition: opacity 0.3s ease;
+      will-change: transform;
+    }
+
+    .shot:hover img {
+      opacity: 1;
+    }
+
+    /* Professional Metadata Display under individual pieces */
+    .caption {
+      display: block;
+      margin-top: 15px;
+      padding: 0 5px 5px 5px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .caption .title-meta {
+      color: #ffffff;
+      font-weight: 400;
+    }
+
+    .caption .status-meta {
+      float: right;
+      color: #a88f5d;
+    }
+
+    /* ========================================
+       LIGHTBOX
+    ======================================== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 40px 20px;
+    }
+    .lightbox.active { display: flex; }
+
+    .lightbox-inner {
+      width: min(1100px, 95vw);
+      height: min(85vh, 900px);
+      display: grid;
+      grid-template-columns: 60px 1fr 60px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lb-btn {
+      height: 60px;
+      width: 60px;
+      border: 1px solid #222;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+      font-size: 20px;
+      transition: background 0.2s ease, opacity 0.2s ease;
+      display: grid;
+      place-items: center;
+      user-select: none;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,0.06); }
+
+    .lb-stage {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      border: 1px solid #111;
+      background: rgba(0,0,0,0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .lb-stage img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .lb-top {
+      position: fixed;
+      top: 22px;
+      right: 22px;
+      display: flex;
+      gap: 10px;
+      z-index: 2100;
+    }
+
+    .lb-close {
+      border: 1px solid #222;
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      transition: background 0.2s ease, opacity 0.2s ease;
+    }
+    .lb-close:hover { background: rgba(255,255,255,0.06); }
+
+    /* ========================================
+       FOOTER
+    ======================================== */
+    footer {
+      text-align: center;
+      padding: 80px 40px;
+      border-top: 1px solid #111;
+      margin-top: 100px;
+      background-color: #000000;
+    }
+
+    footer p {
+      font-size: 10px;
+      color: #444444;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    /* ========================================
+       RESPONSIVE
+    ======================================== */
+    @media (max-width: 1024px) {
+      .masonry { column-gap: 25px; }
+      .commission-banner { max-width: calc(100% - 60px); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 0; }
+      nav .container { padding: 0 20px; }
+
+      nav ul {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.98);
+        padding: 120px 40px;
+        gap: 35px;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      nav ul.active { display: flex; }
+      .menu-toggle { display: flex; }
+
+      .series-header {
+        margin-top: 90px;
+        padding: 40px 20px 20px;
+      }
+      .series-header h1 { font-size: 32px; letter-spacing: 1px; }
+
+      .commission-banner {
+        max-width: calc(100% - 40px);
+        padding: 20px;
+      }
+
+      .gallery-wrap { padding: 0 20px; }
+      .masonry { column-count: 1; column-gap: 0; }
+      .shot { margin-bottom: 30px; }
+      .caption .status-meta { float: none; display: block; margin-top: 5px; }
+
+      .lightbox-inner {
+        grid-template-columns: 46px 1fr 46px;
+      }
+      .lb-btn { width: 46px; height: 46px; }
+      footer { padding: 60px 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ========================================
+       NAVIGATION (Aligned Architectural Links)
+  ======================================== -->
+  <nav>
+    <div class="container">
+      <a href="index.html" class="logo brand-title">MARTIN CUEVA</a>
+
+      <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+
+      <ul id="menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="art.html">Fine Art</a></li>
+        <li><a class="active" href="photography.html">Photography</a></li>
+        <li><a href="escritos.html">Escritos (Español)</a></li>
+        <li><a href="commissions.html" class="cta-nav">Commissions & Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ========================================
+       SERIES HEADER
+  ======================================== -->
+  <section class="series-header" id="seriesHeader">
+    <!-- Rendered Dynamically by JavaScript -->
+  </section>
+
+  <!-- ========================================
+       COMMERCIAL CALL-TO-ACTION BANNER
+  ======================================== -->
+  <section class="commission-banner">
+    <p>Available for fine art archival prints & private editorial commissions. <a href="commissions.html">Inquire About Rates</a></p>
+  </section>
+
+  <!-- ========================================
+       GALLERY
+  ======================================== -->
+  <section class="gallery-wrap">
+    <div class="masonry" id="gallery"></div>
+  </section>
+
+  <!-- ========================================
+       LIGHTBOX
+  ======================================== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lb-top">
+      <button class="lb-close" id="lbClose" type="button">Close</button>
+    </div>
+
+    <div class="lightbox-inner" role="dialog" aria-modal="true" aria-label="Image viewer">
+      <button class="lb-btn" id="lbPrev" type="button" aria-label="Previous image">‹</button>
+
+      <div class="lb-stage" id="lbStage">
+        <img id="lbImg" alt="" />
+      </div>
+
+      <button class="lb-btn" id="lbNext" type="button" aria-label="Next image">›</button>
+    </div>
+  </div>
+
+  <!-- ========================================
+       FOOTER
+  ======================================== -->
+  <footer>
+    <p>© MARTIN CUEVA — ALL RIGHTS RESERVED</p>
+  </footer>
+
+  <!-- ========================================
+       JAVASCRIPT
+  ======================================== -->
+  <script>
+    /* ========================================================================
+       SERIES CONFIGURATION
+       Grammatical parameters corrected ("since 192 aCD" and placeholder descriptions updated)
+       ======================================================================== */
+    const SERIES = {
+      title: "Fine Art, Nature & Urban Photography",
+      metaDetails: "Archival Pigment Prints | Limited Editions Available",
+      description: "A curated collection of visual archives exploring architecture, urban geometry, and natural landscapes.",
+      images: [
+        "Gallery1_ (1).jpg", "Gallery1_ (10).jpg", "Gallery1_ (11).jpg", "Gallery1_ (12).jpg",
+        "Gallery1_ (13).jpg", "Gallery1_ (14).jpg", "Gallery1_ (15).jpg", "Gallery1_ (16).jpg",
+        "Gallery1_ (17).jpg", "Gallery1_ (18).jpg", "Gallery1_ (19).jpg", "Gallery1_ (2).jpg",
+        "Gallery1_ (20).jpg", "Gallery1_ (21).jpg", "Gallery1_ (22).jpg", "Gallery1_ (23).jpg",
+        "Gallery1_ (24).jpg", "Gallery1_ (25).jpg", "Gallery1_ (26).jpg", "Gallery1_ (27).jpg",
+        "Gallery1_ (28).jpg", "Gallery1_ (29).jpg", "Gallery1_ (3).jpg", "Gallery1_ (30).jpg",
+        "Gallery1_ (31).jpg", "Gallery1_ (32).jpg", "Gallery1_ (33).jpg", "Gallery1_ (34).jpg",
+        "Gallery1_ (35).jpg", "Gallery1_ (36).jpg", "Gallery1_ (37).jpg", "Gallery1_ (38).jpg",
+        "Gallery1_ (39).jpg", "Gallery1_ (4).jpg", "Gallery1_ (40).jpg", "Gallery1_ (41).jpg",
+        "Gallery1_ (42).jpg", "Gallery1_ (43).jpg", "Gallery1_ (44).jpg", "Gallery1_ (45).jpg",
+        "Gallery1_ (46).jpg", "Gallery1_ (47).jpg", "Gallery1_ (48).jpg", "Gallery1_ (49).jpg",
+        "Gallery1_ (5).jpg", "Gallery1_ (50).jpg", "Gallery1_ (6).jpg", "Gallery1_ (7).jpg",
+        "Gallery1_ (8).jpg", "Gallery1_ (9).jpg"
+      ]
+    };
+
+    const headerEl = document.getElementById("seriesHeader");
+    const galleryEl = document.getElementById("gallery");
+    const lightboxEl = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbClose = document.getElementById("lbClose");
+    const lbPrev = document.getElementById("lbPrev");
+    const lbNext = document.getElementById("lbNext");
+
+    let currentIndex = 0;
+
+    function renderHeader() {
+      headerEl.innerHTML = `
+        <h1>${SERIES.title}</h1>
+        <div class="series-submeta">${SERIES.metaDetails}</div>
+        <p>${SERIES.description}</p>
+      `;
+    }
+
+    function renderGallery() {
+      const frag = document.createDocumentFragment();
+
+      SERIES.images.forEach((src, idx) => {
+        const shot = document.createElement("div");
+        shot.className = "shot";
+        shot.setAttribute("data-index", idx);
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `${SERIES.title} — Plate ${String(idx + 1).padStart(2, "0")}`;
+        img.loading = "lazy";
+
+        // Structured commercial caption container
+        const caption = document.createElement("div");
+        caption.className = "caption";
+        
+        const titleMeta = document.createElement("span");
+        titleMeta.className = "title-meta";
+        titleMeta.textContent = `Plate ${String(idx + 1).padStart(2, "0")}`;
+
+        const statusMeta = document.createElement("span");
+        statusMeta.className = "status-meta";
+        statusMeta.textContent = "Print Available";
+
+        caption.appendChild(titleMeta);
+        caption.appendChild(statusMeta);
+
+        shot.appendChild(img);
+        shot.appendChild(caption);
+
+        shot.addEventListener("click", () => openLightbox(idx));
+        frag.appendChild(shot);
+      });
+
+      galleryEl.appendChild(frag);
+    }
+
+    function openLightbox(idx) {
+      currentIndex = idx;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
+
+      lightboxEl.classList.add("active");
+      lightboxEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      lightboxEl.classList.remove("active");
+      lightboxEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      lbImg.src = "";
+    }
+
+    function showPrev() {
+      currentIndex = (currentIndex - 1 + SERIES.images.length) % SERIES.images.length;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
+    }
+
+    function showNext() {
+      currentIndex = (currentIndex + 1) % SERIES.images.length;
+      lbImg.src = SERIES.images[currentIndex];
+      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
+    }
+
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("active");
+    }
+
+    function setupMenuLinks() {
+      document.querySelectorAll('#menu a').forEach(link => {
+        link.addEventListener('click', () => {
+          document.getElementById("menu").classList.remove("active");
+        });
+      });
+    }
+
+    lbClose.addEventListener("click", closeLightbox);
+    lbPrev.addEventListener("click", showPrev);
+    lbNext.addEventListener("click", showNext);
+
+    lightboxEl.addEventListener("click", (e) => {
+      if (e.target === lightboxEl) closeLightbox();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (!lightboxEl.classList.contains("active")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") showPrev();
+      if (e.key === "ArrowRight") showNext();
+    });
+
+    document.querySelector(".menu-toggle").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") toggleMenu();
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderHeader();
+      renderGallery();
+      setupMenuLinks();
+    });
+  </script>
+</body>
+</html>
