@@ -257,7 +257,26 @@
             break-inside: avoid;
             margin: 0 0 60px;
             cursor: zoom-in;
+            position: relative;
         }
+
+        /* Small badge shown on shots that have a "buy" link (e.g. published books) */
+        .shot .ext-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #a88f5d;
+            padding: 6px 8px;
+            color: #a88f5d;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .shot:hover .ext-link { opacity: 1; }
 
         .shot img {
             width: 100%;
@@ -355,6 +374,22 @@
             transition: background 0.2s ease, opacity 0.2s ease;
         }
         .lb-close:hover { background: rgba(255,255,255,0.06); }
+
+        .lb-buy-link {
+            display: inline-block;
+            border: 1px solid #a88f5d;
+            background: rgba(0,0,0,0.35);
+            color: #a88f5d;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .lb-buy-link:hover { background: #a88f5d; color: #000000; }
+        .lb-buy-link.hidden { display: none; }
 
         /* ========================================
            COMMISSIONS / AVAILABILITY CTA
@@ -535,6 +570,7 @@
     ======================================== -->
     <div class="lightbox" id="lightbox" aria-hidden="true">
         <div class="lb-top">
+            <a class="lb-buy-link hidden" id="lbBuyLink" href="#" target="_blank" rel="noopener">Buy This Book</a>
             <button class="lb-close" id="lbClose" type="button">Close</button>
         </div>
         <div class="lightbox-inner" role="dialog" aria-modal="true" aria-label="Image viewer">
@@ -585,174 +621,4 @@
                     "Gallery1_ (13).jpg","Gallery1_ (14).jpg","Gallery1_ (15).jpg","Gallery1_ (16).jpg",
                     "Gallery1_ (17).jpg","Gallery1_ (18).jpg","Gallery1_ (19).jpg","Gallery1_ (20).jpg",
                     "Gallery1_ (21).jpg","Gallery1_ (22).jpg","Gallery1_ (23).jpg","Gallery1_ (24).jpg",
-                    "Gallery1_ (25).jpg","Gallery1_ (26).jpg","Gallery1_ (27).jpg","Gallery1_ (28).jpg",
-                    "Gallery1_ (29).jpg","Gallery1_ (30).jpg","Gallery1_ (31).jpg","Gallery1_ (32).jpg",
-                    "Gallery1_ (33).jpg","Gallery1_ (34).jpg","Gallery1_ (35).jpg","Gallery1_ (36).jpg",
-                    "Gallery1_ (37).jpg","Gallery1_ (38).jpg","Gallery1_ (39).jpg","Gallery1_ (40).jpg",
-                    "Gallery1_ (41).jpg","Gallery1_ (42).jpg","Gallery1_ (43).jpg","Gallery1_ (44).jpg",
-                    "Gallery1_ (45).jpg","Gallery1_ (46).jpg","Gallery1_ (47).jpg","Gallery1_ (48).jpg",
-                    "Gallery1_ (49).jpg","Gallery1_ (50).jpg"
-                ]
-            },
-            {
-                id: "people",
-                tabLabel: "People & Portraits",
-                title: "People Photography",
-                meta: "Since 1996 | Misc Lens Sizes",
-                description: "Culture and human history reflected on people's present.",
-                images: [
-                    "Gallery2_1.jpg","Gallery2_2.jpg","Gallery2_3.jpg","Gallery2_4.jpg",
-                    "Gallery2_5.jpg","Gallery2_6.jpg","Gallery2_7.jpg","Gallery2_8.jpg",
-                    "Gallery2_9.jpg","Gallery2_10.jpg","Gallery2_11.jpg","Gallery2_12.jpg",
-                    "Gallery2_13.jpg","Gallery2_14.jpg","Gallery2_15.jpg","Gallery2_16.jpg",
-                    "Gallery2_17.jpg","Gallery2_18.jpg"
-                ]
-            }
-            // To add Gallery3, append: { id: "...", tabLabel: "...", title: "...", meta: "...", description: "...", images: [...] }
-        ];
-
-        /* ========================================================================
-           DO NOT EDIT BELOW THIS LINE
-           ======================================================================== */
-
-        let activeGalleryId = GALLERIES[0].id;
-        let currentIndex = 0;
-        let currentImages = [];
-
-        const tabsEl = document.getElementById("seriesTabs");
-        const panelsEl = document.getElementById("galleryPanels");
-
-        const lightboxEl = document.getElementById("lightbox");
-        const lbImg = document.getElementById("lbImg");
-        const lbClose = document.getElementById("lbClose");
-        const lbPrev = document.getElementById("lbPrev");
-        const lbNext = document.getElementById("lbNext");
-
-        function renderTabs() {
-            tabsEl.innerHTML = "";
-            GALLERIES.forEach((g) => {
-                const btn = document.createElement("button");
-                btn.className = "series-tab" + (g.id === activeGalleryId ? " active" : "");
-                btn.textContent = g.tabLabel;
-                btn.type = "button";
-                btn.addEventListener("click", () => switchGallery(g.id));
-                tabsEl.appendChild(btn);
-            });
-        }
-
-        function renderPanels() {
-            panelsEl.innerHTML = "";
-            GALLERIES.forEach((g) => {
-                const panel = document.createElement("section");
-                panel.className = "gallery-panel" + (g.id === activeGalleryId ? " active" : "");
-                panel.id = "panel-" + g.id;
-
-                const header = document.createElement("div");
-                header.className = "series-header";
-                header.innerHTML = `
-                    <h2>${g.title}</h2>
-                    <div class="series-submeta">${g.meta}</div>
-                    <p class="desc">${g.description}</p>
-                `;
-
-                const wrap = document.createElement("div");
-                wrap.className = "gallery-wrap";
-
-                const masonry = document.createElement("div");
-                masonry.className = "masonry";
-
-                g.images.forEach((src, idx) => {
-                    const shot = document.createElement("div");
-                    shot.className = "shot";
-
-                    const img = document.createElement("img");
-                    img.src = src;
-                    img.alt = `${g.title} ${String(idx + 1).padStart(2, "0")}`;
-                    img.loading = "lazy";
-
-                    shot.appendChild(img);
-                    shot.addEventListener("click", () => openLightbox(g.id, idx));
-
-                    masonry.appendChild(shot);
-                });
-
-                wrap.appendChild(masonry);
-                panel.appendChild(header);
-                panel.appendChild(wrap);
-                panelsEl.appendChild(panel);
-            });
-        }
-
-        function switchGallery(id) {
-            activeGalleryId = id;
-            renderTabs();
-            document.querySelectorAll(".gallery-panel").forEach((p) => {
-                p.classList.toggle("active", p.id === "panel-" + id);
-            });
-        }
-
-        function openLightbox(galleryId, idx) {
-            const g = GALLERIES.find((x) => x.id === galleryId);
-            currentImages = g.images;
-            currentIndex = idx;
-            lbImg.src = currentImages[currentIndex];
-            lbImg.alt = `${g.title} ${String(currentIndex + 1).padStart(2, "0")}`;
-
-            lightboxEl.classList.add("active");
-            lightboxEl.setAttribute("aria-hidden", "false");
-            document.body.style.overflow = "hidden";
-        }
-
-        function closeLightbox() {
-            lightboxEl.classList.remove("active");
-            lightboxEl.setAttribute("aria-hidden", "true");
-            document.body.style.overflow = "";
-            lbImg.src = "";
-        }
-
-        function showPrev() {
-            if (!currentImages.length) return;
-            currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
-            lbImg.src = currentImages[currentIndex];
-        }
-
-        function showNext() {
-            if (!currentImages.length) return;
-            currentIndex = (currentIndex + 1) % currentImages.length;
-            lbImg.src = currentImages[currentIndex];
-        }
-
-        function toggleMenu() {
-            const menu = document.getElementById("menu");
-            if (menu) menu.classList.toggle("active");
-        }
-
-        lbClose.addEventListener("click", closeLightbox);
-        lbPrev.addEventListener("click", showPrev);
-        lbNext.addEventListener("click", showNext);
-
-        lightboxEl.addEventListener("click", (e) => {
-            if (e.target === lightboxEl) closeLightbox();
-        });
-
-        window.addEventListener("keydown", (e) => {
-            if (!lightboxEl.classList.contains("active")) return;
-            if (e.key === "Escape") closeLightbox();
-            if (e.key === "ArrowLeft") showPrev();
-            if (e.key === "ArrowRight") showNext();
-        });
-
-        window.addEventListener("DOMContentLoaded", () => {
-            renderTabs();
-            renderPanels();
-
-            document.querySelectorAll("#menu a").forEach((link) => {
-                link.addEventListener("click", () => {
-                    const menu = document.getElementById("menu");
-                    if (menu) menu.classList.remove("active");
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+                    "G
