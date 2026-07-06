@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fine Art | Martin Cueva</title>
+
+    <style>
+        /* ========================================
+           GLOBAL STYLES & TYPOGRAPHY
+           (matches index.html editorial tone)
+        ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        h1, h2, h3, .brand-title {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: 300;
+        }
+
+        /* ========================================
+           NAVIGATION BAR
+        ======================================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            padding: 25px 0;
+            z-index: 1000;
+            border-bottom: 1px solid #111;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .logo {
+            font-size: 22px;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+        .logo:hover { opacity: 0.7; }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #ffffff;
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a.active::after,
+        nav ul li a:hover::after { width: 100%; }
+        nav ul li a.active { color: #cccccc; }
+        nav ul li a:hover { color: #cccccc; }
+
+        nav ul li a.cta-nav { color: #a88f5d; }
+        nav ul li a.cta-nav::after { background-color: #a88f5d; }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 28px;
+            height: 2px;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        /* ========================================
+           PAGE HEADER (Photography Hero)
+        ======================================== */
+        .page-header {
+            margin-top: 140px;
+            padding: 100px 40px 40px 40px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header h1 {
+            font-size: 52px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+
+        .page-header .subtitle {
+            font-size: 13px;
+            color: #888888;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            line-height: 2;
+            max-width: 720px;
+            margin: 0 auto 10px auto;
+        }
+
+        .availability-pill {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 22px;
+            border: 1px solid #a88f5d;
+            color: #a88f5d;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ========================================
+           SERIES TAB SWITCHER
+        ======================================== */
+        .series-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 50px auto 0 auto;
+            padding: 0 40px;
+            border-bottom: 1px solid #1a1a1a;
+            max-width: 1000px;
+        }
+
+        .series-tab {
+            background: none;
+            border: none;
+            color: #777777;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 16px 4px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .series-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #a88f5d;
+            transition: width 0.3s ease;
+        }
+
+        .series-tab.active {
+            color: #ffffff;
+        }
+
+        .series-tab.active::after { width: 100%; }
+        .series-tab:hover { color: #ffffff; }
+
+        /* ========================================
+           SERIES HEADER (per active gallery)
+        ======================================== */
+        .series-header {
+            padding: 60px 40px 20px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .series-header h2 {
+            font-size: 38px;
+            font-weight: 200;
+            letter-spacing: 3px;
+            margin-bottom: 14px;
+        }
+
+        .series-submeta {
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .series-header p.desc {
+            font-size: 15px;
+            color: #999;
+            letter-spacing: 1px;
+            line-height: 1.8;
+        }
+
+        /* ========================================
+           GALLERY (masonry, matches Gallery1/2)
+        ======================================== */
+        .gallery-wrap {
+            max-width: 1400px;
+            margin: 40px auto 0;
+            padding: 0 40px;
+        }
+
+        .masonry {
+            column-count: 2;
+            column-gap: 60px;
+        }
+
+        .shot {
+            break-inside: avoid;
+            margin: 0 0 60px;
+            cursor: zoom-in;
+            position: relative;
+        }
+
+        .shot img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #111;
+            border: 1px solid #111;
+            opacity: 0.92;
+            transition: opacity 0.25s ease, transform 0.35s ease;
+            will-change: transform;
+        }
+
+        .shot:hover img {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        /* Small external-link badge shown only on shots that have a link */
+        .shot .ext-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            padding: 6px 8px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .shot:hover .ext-link { opacity: 1; }
+
+        .gallery-panel { display: none; }
+        .gallery-panel.active { display: block; }
+
+        /* ========================================
+           LIGHTBOX
+        ======================================== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 40px 20px;
+        }
+        .lightbox.active { display: flex; }
+
+        .lightbox-inner {
+            width: min(1100px, 95vw);
+            height: min(85vh, 900px);
+            display: grid;
+            grid-template-columns: 60px 1fr 60px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lb-btn {
+            height: 60px;
+            width: 60px;
+            border: 1px solid #222;
+            background: rgba(0,0,0,0.35);
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background 0.2s ease, opacity 0.2s ease;
+            display: grid;
+            place-items: center;
+            user-select: none;
+        }
+        .lb-btn:hover { background: rgba(255,255,255,0.06); }
+
+        .lb-stage {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            border: 1px solid #111;
+            background: rgba(0,0,0,0.25);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .lb-stage img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .lb-top {
+            position: fixed;
+            top: 22px;
+            right: 22px;
+            display: flex;
+            gap: 10px;
+            z-index: 2100;
+        }
+
+        .lb-close {
+            border: 1px solid #222;
+            background: rgba(0,0,0,0.35);
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            transition: background 0.2s ease, opacity 0.2s ease;
+        }
+        .lb-close:hover { background: rgba(255,255,255,0.06); }
+
+        .lb-open-link {
+            border: 1px solid #a88f5d;
+            background: rgba(0,0,0,0.35);
+            color: #a88f5d;
+            cursor: pointer;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .lb-open-link:hover { background-color: #a88f5d; color: #000000; }
+        .lb-open-link.hidden { display: none; }
+
+        /* ========================================
+           COMMISSIONS / AVAILABILITY CTA
+        ======================================== */
+        .commission-cta {
+            max-width: 1000px;
+            margin: 120px auto 0 auto;
+            padding: 70px 40px;
+            text-align: center;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+        }
+
+        .commission-cta h2 {
+            font-size: 30px;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .commission-cta p {
+            font-size: 14px;
+            color: #999999;
+            letter-spacing: 0.5px;
+            line-height: 1.9;
+            max-width: 640px;
+            margin: 0 auto 30px auto;
+        }
+
+        .commission-cta .cta-button {
+            display: inline-block;
+            padding: 16px 36px;
+            border: 1px solid #a88f5d;
+            color: #a88f5d;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .commission-cta .cta-button:hover {
+            background-color: #a88f5d;
+            color: #000000;
+        }
+
+        /* ========================================
+           FOOTER
+        ======================================== */
+        footer {
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 1px solid #111;
+            margin-top: 80px;
+        }
+
+        footer .footer-bio {
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+            font-size: 13px;
+            color: #777777;
+            line-height: 1.8;
+        }
+
+        footer p.copyright {
+            font-size: 10px;
+            color: #444444;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        /* ========================================
+           RESPONSIVE - TABLET
+        ======================================== */
+        @media (max-width: 1024px) {
+            nav .container { padding: 0 30px; }
+            .page-header { padding: 80px 30px 30px 30px; }
+            .page-header h1 { font-size: 40px; }
+            .masonry { column-gap: 40px; }
+        }
+
+        /* ========================================
+           RESPONSIVE - MOBILE
+        ======================================== */
+        @media (max-width: 768px) {
+            nav { padding: 20px 0; }
+            nav .container { padding: 0 20px; }
+
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background-color: rgba(0, 0, 0, 0.98);
+                padding: 120px 40px;
+                gap: 35px;
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+            nav ul.active { display: flex; }
+            nav ul li a { font-size: 16px; letter-spacing: 3px; }
+            .menu-toggle { display: flex; }
+
+            .page-header { margin-top: 90px; padding: 40px 20px; }
+            .page-header h1 { font-size: 32px; letter-spacing: 1px; }
+            .page-header .subtitle { font-size: 11px; letter-spacing: 2px; }
+
+            .series-tabs { gap: 12px; padding: 0 20px; }
+            .series-tab { font-size: 11px; padding: 12px 2px; }
+
+            .series-header { padding: 40px 20px 10px; }
+            .series-header h2 { font-size: 28px; }
+
+            .gallery-wrap { padding: 0 20px; }
+            .masonry { column-count: 1; column-gap: 0; }
+            .shot { margin-bottom: 40px; }
+
+            .lightbox-inner { grid-template-columns: 46px 1fr 46px; }
+            .lb-btn { width: 46px; height: 46px; }
+
+            .commission-cta { margin-top: 80px; padding: 50px 20px; }
+            .commission-cta h2 { font-size: 24px; }
+
+            footer { padding: 50px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================
+         NAVIGATION BAR
+    ======================================== -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo brand-title">Martin Cueva</a>
+
+            <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Navigation Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul id="menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="art.html" class="active">Fine Art</a></li>
+                <li><a href="photography.html">Photography</a></li>
+                <li><a href="escritos.html">Escritos (Español)</a></li>
+                <li><a href="commissions.html" class="cta-nav">Commissions & Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ========================================
+         PAGE HEADER
+    ======================================== -->
+    <section class="page-header">
+        <h1>Fine Art</h1>
+        <p class="subtitle">Drawings, Paintings & Mixed Media Works</p>
+        <p class="subtitle">Originals Available for Collectors & Commissions</p>
+        <div class="availability-pill">Currently Booking New Assignments</div>
+    </section>
+
+    <!-- ========================================
+         SERIES TABS
+    ======================================== -->
+    <nav class="series-tabs" id="seriesTabs" aria-label="Fine art series selector">
+        <!-- Injected by JS -->
+    </nav>
+
+    <!-- ========================================
+         GALLERY PANELS
+    ======================================== -->
+    <div id="galleryPanels">
+        <!-- Injected by JS -->
+    </div>
+
+    <!-- ========================================
+         LIGHTBOX
+    ======================================== -->
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <div class="lb-top">
+            <a class="lb-open-link hidden" id="lbOpenLink" href="#" target="_blank" rel="noopener">View Link</a>
+            <button class="lb-close" id="lbClose" type="button">Close</button>
+        </div>
+        <div class="lightbox-inner" role="dialog" aria-modal="true" aria-label="Image viewer">
+            <button class="lb-btn" id="lbPrev" type="button" aria-label="Previous image">‹</button>
+            <div class="lb-stage" id="lbStage">
+                <img id="lbImg" alt="" />
+            </div>
+            <button class="lb-btn" id="lbNext" type="button" aria-label="Next image">›</button>
+        </div>
+    </div>
+
+    <!-- ========================================
+         COMMISSIONS / AVAILABILITY CTA
+    ======================================== -->
+    <section class="commission-cta">
+        <h2>Open for Commissions & Assignments</h2>
+        <p>Martin Cueva is available for original drawing and painting commissions, mixed media pieces, and fine art print orders. Based between Florida and Latin America, and available to travel internationally for the right project.</p>
+        <a href="commissions.html" class="cta-button">Inquire About a Project</a>
+    </section>
+
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+    <footer>
+        <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.</p>
+        <p class="copyright">© Martin Cueva — All Rights Reserved</p>
+    </footer>
+
+    <!-- ========================================
+         JAVASCRIPT
+    ======================================== -->
+    <script>
+        /* ========================================================================
+           GALLERIES CONFIG — EDIT THIS ONLY
+           Add a new object to this array to bring in a future "Gallery3" series.
+           ======================================================================== */
+        const GALLERIES = [
+            {
+                id: "paintings",
+                tabLabel: "Paintings",
+                title: "Paintings",
+                meta: "Since 207 aCD | Mixed Media",
+                description: "Reality plus my filter of tone and color.",
+                images: [
+                    "Gallery5_1.png","Gallery5_2.png","Gallery5_3.png","Gallery5_4.png",
+                    "Gallery5_1.jpg","Gallery5_6.jpg","Gallery5_7.png","Gallery5_8.png",
+                    "Gallery5_9.png","Gallery5_10.png","Gallery5_11.png","Gallery5_12.png",
+                    "Gallery5_13.png"
+                ]
+            },
+            {
+                id: "drawings",
+                tabLabel: "Drawings",
+                title: "Drawings",
+                meta: "Since 206 aCD | Mixed Media",
+                description: "My vision on paper.",
+                images: [
+                    "Gallery4_1.jpg","Gallery4_2.jpg","Gallery4_3.jpg","Gallery4_4.jpg",
+                    "Gallery4_5.png","Gallery4_6.jpg","Gallery4_7.png","Gallery4_8.png",
+                    "Gallery4_9.png","Gallery4_10.jpg","Gallery4_11.jpg","Gallery4_12.jpg",
+                    "Gallery4_13.jpg","Gallery4_14.jpg","Gallery4_15.jpg","Gallery4_16.jpg",
+                    "Gallery4_17.png","Gallery4_18.png","Gallery4_19.png","Gallery4_20.jpg",
+                    "Gallery4_21.png","Gallery4_22.png","Gallery4_23.jpg","Gallery4_24.png",
+                    "Gallery4_25.png","Gallery4_26.png","Gallery4_27.jpg","Gallery4_28.jpg",
+                    "Gallery4_29.jpg","Gallery4_30.png","Gallery4_31.png","Gallery4_32.png",
+                    "Gallery4_33.png","Gallery4_34.png","Gallery4_35.png","Gallery4_36.png",
+                    "Gallery4_37.png","Gallery4_38.png","Gallery4_39.png","Gallery4_40.png"
+                ]
+            }
+        ];
+
+        /* ========================================================================
+           DO NOT EDIT BELOW THIS LINE
+           ======================================================================== */
+
+        let activeGalleryId = GALLERIES[0].id;
+        let currentIndex = 0;
+        let currentImages = [];
+
+        const tabsEl = document.getElementById("seriesTabs");
+        const panelsEl = document.getElementById("galleryPanels");
+
+        const lightboxEl = document.getElementById("lightbox");
+        const lbImg = document.getElementById("lbImg");
+        const lbClose = document.getElementById("lbClose");
+        const lbPrev = document.getElementById("lbPrev");
+        const lbNext = document.getElementById("lbNext");
+        const lbOpenLink = document.getElementById("lbOpenLink");
+
+        // Images may be a plain filename string (Gallery1/2 style) or an
+        // object { src, link } (Gallery3 style, for images that open a URL).
+        function getSrc(item) { return typeof item === "string" ? item : item.src; }
+        function getLink(item) { return typeof item === "string" ? null : item.link; }
+
+        function renderTabs() {
+            tabsEl.innerHTML = "";
+            GALLERIES.forEach((g) => {
+                const btn = document.createElement("button");
+                btn.className = "series-tab" + (g.id === activeGalleryId ? " active" : "");
+                btn.textContent = g.tabLabel;
+                btn.type = "button";
+                btn.addEventListener("click", () => switchGallery(g.id));
+                tabsEl.appendChild(btn);
+            });
+        }
+
+        function renderPanels() {
+            panelsEl.innerHTML = "";
+            GALLERIES.forEach((g) => {
+                const panel = document.createElement("section");
+                panel.className = "gallery-panel" + (g.id === activeGalleryId ? " active" : "");
+                panel.id = "panel-" + g.id;
+
+                const header = document.createElement("div");
+                header.className = "series-header";
+                header.innerHTML = `
+                    <h2>${g.title}</h2>
+                    <div class="series-submeta">${g.meta}</div>
+                    <p class="desc">${g.description}</p>
+                `;
+
+                const wrap = document.createElement("div");
+                wrap.className = "gallery-wrap";
+
+                const masonry = document.createElement("div");
+                masonry.className = "masonry";
+
+                g.images.forEach((item, idx) => {
+                    const shot = document.createElement("div");
+                    shot.className = "shot";
+
+                    const img = document.createElement("img");
+                    img.src = getSrc(item);
+                    img.alt = `${g.title} ${String(idx + 1).padStart(2, "0")}`;
+                    img.loading = "lazy";
+
+                    shot.appendChild(img);
+
+                    if (getLink(item)) {
+                        const badge = document.createElement("span");
+                        badge.className = "ext-link";
+                        badge.textContent = "Link ↗";
+                        shot.appendChild(badge);
+                    }
+
+                    shot.addEventListener("click", () => openLightbox(g.id, idx));
+
+                    masonry.appendChild(shot);
+                });
+
+                wrap.appendChild(masonry);
+                panel.appendChild(header);
+                panel.appendChild(wrap);
+                panelsEl.appendChild(panel);
+            });
+        }
+
+        function switchGallery(id) {
+            activeGalleryId = id;
+            renderTabs();
+            document.querySelectorAll(".gallery-panel").forEach((p) => {
+                p.classList.toggle("active", p.id === "panel-" + id);
+            });
+        }
+
+        let currentGalleryTitle = "";
+
+        function updateLightboxLink() {
+            const link = getLink(currentImages[currentIndex]);
+            if (link) {
+                lbOpenLink.href = link;
+                lbOpenLink.classList.remove("hidden");
+            } else {
+                lbOpenLink.removeAttribute("href");
+                lbOpenLink.classList.add("hidden");
+            }
+        }
+
+        function openLightbox(galleryId, idx) {
+            const g = GALLERIES.find((x) => x.id === galleryId);
+            currentImages = g.images;
+            currentGalleryTitle = g.title;
+            currentIndex = idx;
+            lbImg.src = getSrc(currentImages[currentIndex]);
+            lbImg.alt = `${g.title} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
+
+            lightboxEl.classList.add("active");
+            lightboxEl.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeLightbox() {
+            lightboxEl.classList.remove("active");
+            lightboxEl.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            lbImg.src = "";
+        }
+
+        function showPrev() {
+            if (!currentImages.length) return;
+            currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+            lbImg.src = getSrc(currentImages[currentIndex]);
+            lbImg.alt = `${currentGalleryTitle} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
+        }
+
+        function showNext() {
+            if (!currentImages.length) return;
+            currentIndex = (currentIndex + 1) % currentImages.length;
+            lbImg.src = getSrc(currentImages[currentIndex]);
+            lbImg.alt = `${currentGalleryTitle} ${String(currentIndex + 1).padStart(2, "0")}`;
+            updateLightboxLink();
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById("menu");
+            if (menu) menu.classList.toggle("active");
+        }
+
+        lbClose.addEventListener("click", closeLightbox);
+        lbPrev.addEventListener("click", showPrev);
+        lbNext.addEventListener("click", showNext);
+        lbOpenLink.addEventListener("click", (e) => e.stopPropagation());
+
+        lightboxEl.addEventListener("click", (e) => {
+            if (e.target === lightboxEl) closeLightbox();
+        });
+
+        window.addEventListener("keydown", (e) => {
+            if (!lightboxEl.classList.contains("active")) return;
+            if (e.key === "Escape") closeLightbox();
+            if (e.key === "ArrowLeft") showPrev();
+            if (e.key === "ArrowRight") showNext();
+        });
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderTabs();
+            renderPanels();
+
+            document.querySelectorAll("#menu a").forEach((link) => {
+                link.addEventListener("click", () => {
+                    const menu = document.getElementById("menu");
+                    if (menu) menu.classList.remove("active");
+                });
+            });
+        });
+    </script>
+</body>
+</html>
