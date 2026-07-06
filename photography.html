@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fine Art & Commission Photography | Martin Cueva</title>
+  <title>Photography Portfolio & Commissions | Martin Cueva</title>
 
   <style>
     /* ========================================
        GLOBAL STYLES & TYPOGRAPHY
        Aligned with premium home page design guidelines
     ======================================== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
 
     body {
       font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
@@ -20,7 +24,10 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    a { color: inherit; text-decoration: none; }
+    a { 
+      color: inherit; 
+      text-decoration: none; 
+    }
 
     h1, h2, h3, .brand-title {
       font-family: 'Georgia', 'Times New Roman', serif;
@@ -28,7 +35,7 @@
     }
 
     /* ========================================
-       NAVIGATION
+       NAVIGATION BAR
     ======================================== */
     nav {
       position: fixed;
@@ -96,10 +103,10 @@
     }
 
     nav ul li a.cta-nav {
-        color: #a88f5d;
+      color: #a88f5d; /* Sophisticated Muted Gold */
     }
     nav ul li a.cta-nav::after {
-        background-color: #a88f5d;
+      background-color: #a88f5d;
     }
 
     .menu-toggle {
@@ -121,7 +128,7 @@
     ======================================== */
     .series-header {
       margin-top: 140px;
-      padding: 100px 40px 30px;
+      padding: 80px 40px 20px;
       text-align: center;
       max-width: 1000px;
       margin-left: auto;
@@ -157,7 +164,7 @@
     ======================================== */
     .commission-banner {
       max-width: 1320px;
-      margin: 40px auto 20px auto;
+      margin: 20px auto 40px auto;
       padding: 30px 40px;
       background-color: #050505;
       border: 1px solid #111;
@@ -186,11 +193,41 @@
     }
 
     /* ========================================
+       CATEGORY FILTER SYSTEM
+    ======================================== */
+    .category-filters {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      padding: 0 40px;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid #222;
+      color: #888;
+      padding: 10px 24px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      color: #ffffff;
+      border-color: #ffffff;
+      background-color: #0a0a0a;
+    }
+
+    /* ========================================
        GALLERY MASONRY FLOW
     ======================================== */
     .gallery-wrap {
       max-width: 1400px;
-      margin: 20px auto 0;
+      margin: 0 auto;
       padding: 0 40px;
     }
 
@@ -227,7 +264,7 @@
       opacity: 1;
     }
 
-    /* Professional Metadata Display under individual pieces */
+    /* Professional Fine Art Attribution Captions */
     .caption {
       display: block;
       margin-top: 15px;
@@ -312,7 +349,7 @@
       z-index: 2100;
     }
 
-    .lb-close {
+    .lb-close, .lb-open-link {
       border: 1px solid #222;
       background: rgba(0,0,0,0.35);
       color: #fff;
@@ -323,7 +360,8 @@
       padding: 12px 14px;
       transition: background 0.2s ease, opacity 0.2s ease;
     }
-    .lb-close:hover { background: rgba(255,255,255,0.06); }
+    .lb-close:hover, .lb-open-link:hover { background: rgba(255,255,255,0.06); }
+    .lb-open-link.hidden { display: none; }
 
     /* ========================================
        FOOTER
@@ -345,7 +383,7 @@
     }
 
     /* ========================================
-       RESPONSIVE
+       RESPONSIVE DESIGN SYSTEM
     ======================================== */
     @media (max-width: 1024px) {
       .masonry { column-gap: 25px; }
@@ -381,6 +419,12 @@
         padding: 20px;
       }
 
+      .category-filters {
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 20px;
+      }
+
       .gallery-wrap { padding: 0 20px; }
       .masonry { column-count: 1; column-gap: 0; }
       .shot { margin-bottom: 30px; }
@@ -397,7 +441,7 @@
 
 <body>
   <!-- ========================================
-       NAVIGATION (Aligned Architectural Links)
+       NAVIGATION BAR
   ======================================== -->
   <nav>
     <div class="container">
@@ -418,18 +462,30 @@
   </nav>
 
   <!-- ========================================
-       SERIES HEADER
+       PORTFOLIO CORE HEADER
   ======================================== -->
-  <section class="series-header" id="seriesHeader">
-    <!-- Rendered Dynamically by JavaScript -->
+  <section class="series-header">
+    <h1>Photography Works</h1>
+    <div class="series-submeta">Fine Art Archives & Editorial Commissions</div>
+    <p>A comprehensive visual index exploring architectural landscapes, urban structures, environmental essays, and published monographs.</p>
   </section>
 
   <!-- ========================================
        COMMERCIAL CALL-TO-ACTION BANNER
   ======================================== -->
   <section class="commission-banner">
-    <p>Available for fine art archival prints & private editorial commissions. <a href="commissions.html">Inquire About Rates</a></p>
+    <p>Available for fine art archival prints, custom catalogs, & private editorial assignments. <a href="commissions.html">Inquire About Rates</a></p>
   </section>
+
+  <!-- ========================================
+       CATEGORY FILTERS
+  ======================================== -->
+  <div class="category-filters">
+    <button class="filter-btn active" onclick="filterGallery('all', this)">All Portfolios</button>
+    <button class="filter-btn" onclick="filterGallery('urban', this)">Urban & Nature</button>
+    <button class="filter-btn" onclick="filterGallery('people', this)">People</button>
+    <button class="filter-btn" onclick="filterGallery('monographs', this)">Published Books</button>
+  </div>
 
   <!-- ========================================
        GALLERY
@@ -439,10 +495,11 @@
   </section>
 
   <!-- ========================================
-       LIGHTBOX
+       LIGHTBOX System
   ======================================== -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lb-top">
+      <a class="lb-open-link hidden" id="lbOpenLink" href="#" target="_blank" rel="noopener">Purchase / View Asset</a>
       <button class="lb-close" id="lbClose" type="button">Close</button>
     </div>
 
@@ -465,155 +522,59 @@
   </footer>
 
   <!-- ========================================
-       JAVASCRIPT
+       JAVASCRIPT ARCHITECTURE
   ======================================== -->
   <script>
-    /* ========================================================================
-       SERIES CONFIGURATION
-       Grammatical parameters corrected ("since 192 aCD" and placeholder descriptions updated)
-       ======================================================================== */
-    const SERIES = {
-      title: "Fine Art, Nature & Urban Photography",
-      metaDetails: "Archival Pigment Prints | Limited Editions Available",
-      description: "A curated collection of visual archives exploring architecture, urban geometry, and natural landscapes.",
-      images: [
-        "Gallery1_ (1).jpg", "Gallery1_ (10).jpg", "Gallery1_ (11).jpg", "Gallery1_ (12).jpg",
-        "Gallery1_ (13).jpg", "Gallery1_ (14).jpg", "Gallery1_ (15).jpg", "Gallery1_ (16).jpg",
-        "Gallery1_ (17).jpg", "Gallery1_ (18).jpg", "Gallery1_ (19).jpg", "Gallery1_ (2).jpg",
-        "Gallery1_ (20).jpg", "Gallery1_ (21).jpg", "Gallery1_ (22).jpg", "Gallery1_ (23).jpg",
-        "Gallery1_ (24).jpg", "Gallery1_ (25).jpg", "Gallery1_ (26).jpg", "Gallery1_ (27).jpg",
-        "Gallery1_ (28).jpg", "Gallery1_ (29).jpg", "Gallery1_ (3).jpg", "Gallery1_ (30).jpg",
-        "Gallery1_ (31).jpg", "Gallery1_ (32).jpg", "Gallery1_ (33).jpg", "Gallery1_ (34).jpg",
-        "Gallery1_ (35).jpg", "Gallery1_ (36).jpg", "Gallery1_ (37).jpg", "Gallery1_ (38).jpg",
-        "Gallery1_ (39).jpg", "Gallery1_ (4).jpg", "Gallery1_ (40).jpg", "Gallery1_ (41).jpg",
-        "Gallery1_ (42).jpg", "Gallery1_ (43).jpg", "Gallery1_ (44).jpg", "Gallery1_ (45).jpg",
-        "Gallery1_ (46).jpg", "Gallery1_ (47).jpg", "Gallery1_ (48).jpg", "Gallery1_ (49).jpg",
-        "Gallery1_ (5).jpg", "Gallery1_ (50).jpg", "Gallery1_ (6).jpg", "Gallery1_ (7).jpg",
-        "Gallery1_ (8).jpg", "Gallery1_ (9).jpg"
-      ]
-    };
-
-    const headerEl = document.getElementById("seriesHeader");
-    const galleryEl = document.getElementById("gallery");
-    const lightboxEl = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lbImg");
-    const lbClose = document.getElementById("lbClose");
-    const lbPrev = document.getElementById("lbPrev");
-    const lbNext = document.getElementById("lbNext");
-
-    let currentIndex = 0;
-
-    function renderHeader() {
-      headerEl.innerHTML = `
-        <h1>${SERIES.title}</h1>
-        <div class="series-submeta">${SERIES.metaDetails}</div>
-        <p>${SERIES.description}</p>
-      `;
-    }
-
-    function renderGallery() {
-      const frag = document.createDocumentFragment();
-
-      SERIES.images.forEach((src, idx) => {
-        const shot = document.createElement("div");
-        shot.className = "shot";
-        shot.setAttribute("data-index", idx);
-
-        const img = document.createElement("img");
-        img.src = src;
-        img.alt = `${SERIES.title} — Plate ${String(idx + 1).padStart(2, "0")}`;
-        img.loading = "lazy";
-
-        // Structured commercial caption container
-        const caption = document.createElement("div");
-        caption.className = "caption";
-        
-        const titleMeta = document.createElement("span");
-        titleMeta.className = "title-meta";
-        titleMeta.textContent = `Plate ${String(idx + 1).padStart(2, "0")}`;
-
-        const statusMeta = document.createElement("span");
-        statusMeta.className = "status-meta";
-        statusMeta.textContent = "Print Available";
-
-        caption.appendChild(titleMeta);
-        caption.appendChild(statusMeta);
-
-        shot.appendChild(img);
-        shot.appendChild(caption);
-
-        shot.addEventListener("click", () => openLightbox(idx));
-        frag.appendChild(shot);
-      });
-
-      galleryEl.appendChild(frag);
-    }
-
-    function openLightbox(idx) {
-      currentIndex = idx;
-      lbImg.src = SERIES.images[currentIndex];
-      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
-
-      lightboxEl.classList.add("active");
-      lightboxEl.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeLightbox() {
-      lightboxEl.classList.remove("active");
-      lightboxEl.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      lbImg.src = "";
-    }
-
-    function showPrev() {
-      currentIndex = (currentIndex - 1 + SERIES.images.length) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
-      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
-    }
-
-    function showNext() {
-      currentIndex = (currentIndex + 1) % SERIES.images.length;
-      lbImg.src = SERIES.images[currentIndex];
-      lbImg.alt = `${SERIES.title} — Plate ${String(currentIndex + 1).padStart(2, "0")}`;
-    }
-
-    function toggleMenu() {
-      document.getElementById("menu").classList.toggle("active");
-    }
-
-    function setupMenuLinks() {
-      document.querySelectorAll('#menu a').forEach(link => {
-        link.addEventListener('click', () => {
-          document.getElementById("menu").classList.remove("active");
-        });
-      });
-    }
-
-    lbClose.addEventListener("click", closeLightbox);
-    lbPrev.addEventListener("click", showPrev);
-    lbNext.addEventListener("click", showNext);
-
-    lightboxEl.addEventListener("click", (e) => {
-      if (e.target === lightboxEl) closeLightbox();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (!lightboxEl.classList.contains("active")) return;
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") showPrev();
-      if (e.key === "ArrowRight") showNext();
-    });
-
-    document.querySelector(".menu-toggle").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") toggleMenu();
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-      renderHeader();
-      renderGallery();
-      setupMenuLinks();
-    });
-  </script>
-</body>
-</html>
+    /* Unification of assets into segmented array configurations */
+    const MASTER_PORTFOLIO = [
+      // CATEGORY: URBAN & NATURE
+      { src: "Gallery1_ (1).jpg", category: "urban", label: "Urban & Nature Archive 01", link: null, action: "Print Available" },
+      { src: "Gallery1_ (10).jpg", category: "urban", label: "Urban & Nature Archive 10", link: null, action: "Print Available" },
+      { src: "Gallery1_ (11).jpg", category: "urban", label: "Urban & Nature Archive 11", link: null, action: "Print Available" },
+      { src: "Gallery1_ (12).jpg", category: "urban", label: "Urban & Nature Archive 12", link: null, action: "Print Available" },
+      { src: "Gallery1_ (13).jpg", category: "urban", label: "Urban & Nature Archive 13", link: null, action: "Print Available" },
+      { src: "Gallery1_ (14).jpg", category: "urban", label: "Urban & Nature Archive 14", link: null, action: "Print Available" },
+      { src: "Gallery1_ (15).jpg", category: "urban", label: "Urban & Nature Archive 15", link: null, action: "Print Available" },
+      { src: "Gallery1_ (16).jpg", category: "urban", label: "Urban & Nature Archive 16", link: null, action: "Print Available" },
+      { src: "Gallery1_ (17).jpg", category: "urban", label: "Urban & Nature Archive 17", link: null, action: "Print Available" },
+      { src: "Gallery1_ (18).jpg", category: "urban", label: "Urban & Nature Archive 18", link: null, action: "Print Available" },
+      { src: "Gallery1_ (19).jpg", category: "urban", label: "Urban & Nature Archive 19", link: null, action: "Print Available" },
+      { src: "Gallery1_ (2).jpg", category: "urban", label: "Urban & Nature Archive 02", link: null, action: "Print Available" },
+      { src: "Gallery1_ (20).jpg", category: "urban", label: "Urban & Nature Archive 20", link: null, action: "Print Available" },
+      { src: "Gallery1_ (21).jpg", category: "urban", label: "Urban & Nature Archive 21", link: null, action: "Print Available" },
+      { src: "Gallery1_ (22).jpg", category: "urban", label: "Urban & Nature Archive 22", link: null, action: "Print Available" },
+      { src: "Gallery1_ (23).jpg", category: "urban", label: "Urban & Nature Archive 23", link: null, action: "Print Available" },
+      { src: "Gallery1_ (24).jpg", category: "urban", label: "Urban & Nature Archive 24", link: null, action: "Print Available" },
+      { src: "Gallery1_ (25).jpg", category: "urban", label: "Urban & Nature Archive 25", link: null, action: "Print Available" },
+      { src: "Gallery1_ (26).jpg", category: "urban", label: "Urban & Nature Archive 26", link: null, action: "Print Available" },
+      { src: "Gallery1_ (27).jpg", category: "urban", label: "Urban & Nature Archive 27", link: null, action: "Print Available" },
+      { src: "Gallery1_ (28).jpg", category: "urban", label: "Urban & Nature Archive 28", link: null, action: "Print Available" },
+      { src: "Gallery1_ (29).jpg", category: "urban", label: "Urban & Nature Archive 29", link: null, action: "Print Available" },
+      { src: "Gallery1_ (3).jpg", category: "urban", label: "Urban & Nature Archive 03", link: null, action: "Print Available" },
+      { src: "Gallery1_ (30).jpg", category: "urban", label: "Urban & Nature Archive 30", link: null, action: "Print Available" },
+      { src: "Gallery1_ (31).jpg", category: "urban", label: "Urban & Nature Archive 31", link: null, action: "Print Available" },
+      { src: "Gallery1_ (32).jpg", category: "urban", label: "Urban & Nature Archive 32", link: null, action: "Print Available" },
+      { src: "Gallery1_ (33).jpg", category: "urban", label: "Urban & Nature Archive 33", link: null, action: "Print Available" },
+      { src: "Gallery1_ (34).jpg", category: "urban", label: "Urban & Nature Archive 34", link: null, action: "Print Available" },
+      { src: "Gallery1_ (35).jpg", category: "urban", label: "Urban & Nature Archive 35", link: null, action: "Print Available" },
+      { src: "Gallery1_ (36).jpg", category: "urban", label: "Urban & Nature Archive 36", link: null, action: "Print Available" },
+      { src: "Gallery1_ (37).jpg", category: "urban", label: "Urban & Nature Archive 37", link: null, action: "Print Available" },
+      { src: "Gallery1_ (38).jpg", category: "urban", label: "Urban & Nature Archive 38", link: null, action: "Print Available" },
+      { src: "Gallery1_ (39).jpg", category: "urban", label: "Urban & Nature Archive 39", link: null, action: "Print Available" },
+      { src: "Gallery1_ (4).jpg", category: "urban", label: "Urban & Nature Archive 04", link: null, action: "Print Available" },
+      { src: "Gallery1_ (40).jpg", category: "urban", label: "Urban & Nature Archive 40", link: null, action: "Print Available" },
+      { src: "Gallery1_ (41).jpg", category: "urban", label: "Urban & Nature Archive 41", link: null, action: "Print Available" },
+      { src: "Gallery1_ (42).jpg", category: "urban", label: "Urban & Nature Archive 42", link: null, action: "Print Available" },
+      { src: "Gallery1_ (43).jpg", category: "urban", label: "Urban & Nature Archive 43", link: null, action: "Print Available" },
+      { src: "Gallery1_ (44).jpg", category: "urban", label: "Urban & Nature Archive 44", link: null, action: "Print Available" },
+      { src: "Gallery1_ (45).jpg", category: "urban", label: "Urban & Nature Archive 45", link: null, action: "Print Available" },
+      { src: "Gallery1_ (46).jpg", category: "urban", label: "Urban & Nature Archive 46", link: null, action: "Print Available" },
+      { src: "Gallery1_ (47).jpg", category: "urban", label: "Urban & Nature Archive 47", link: null, action: "Print Available" },
+      { src: "Gallery1_ (48).jpg", category: "urban", label: "Urban & Nature Archive 48", link: null, action: "Print Available" },
+      { src: "Gallery1_ (49).jpg", category: "urban", label: "Urban & Nature Archive 49", link: null, action: "Print Available" },
+      { src: "Gallery1_ (5).jpg", category: "urban", label: "Urban & Nature Archive 05", link: null, action: "Print Available" },
+      { src: "Gallery1_ (50).jpg", category: "urban", label: "Urban & Nature Archive 50", link: null, action: "Print Available" },
+      { src: "Gallery1_ (6).jpg", category: "urban", label: "Urban & Nature Archive 06", link: null, action: "Print Available" },
+      { src: "Gallery1_ (7).jpg", category: "urban", label: "Urban & Nature Archive 07", link: null, action: "Print Available" },
+      { src: "Gallery1_ (8).jpg", category: "urban", label: "Urban & Nature Archive 08", link: null, action: "Print Available" },
+      { src: "Gallery1_ (9).jpg", category: "urb
