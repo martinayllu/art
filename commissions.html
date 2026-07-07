@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Escritos & Columnas Editoriales | Martin Cueva</title>
+    <title>Commissions & Contact | Martin Cueva</title>
 
     <style>
         /* ========================================
@@ -19,7 +19,7 @@
             font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
             background-color: #000000;
             color: #ffffff;
-            line-height: 1.6;
+            line-height: 1.8;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -120,196 +120,190 @@
         }
 
         /* ========================================
-           PAGE HEADER
+           COMMISSIONS PAGE STRUCT
            ======================================== */
-        .page-header {
-            margin-top: 140px;
-            padding: 100px 40px 40px 40px;
-            text-align: center;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .page-header h1 {
-            font-size: 52px;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            line-height: 1.25;
-        }
-
-        .page-header .subtitle {
-            font-size: 13px;
-            color: #888888;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 300;
-            line-height: 2;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        /* ========================================
-           CATEGORIES TAB SWITCHER
-           ======================================== */
-        .series-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin: 50px auto 0 auto;
-            padding: 0 40px;
-            border-bottom: 1px solid #1a1a1a;
-            max-width: 1000px;
-        }
-
-        .series-tab {
-            background: none;
-            border: none;
-            color: #777777;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 16px 4px;
-            cursor: pointer;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .series-tab::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background-color: #a88f5d;
-            transition: width 0.3s ease;
-        }
-
-        .series-tab.active { color: #ffffff; }
-        .series-tab.active::after { width: 100%; }
-        .series-tab:hover { color: #ffffff; }
-
-        /* ========================================
-           EDITORIAL FEED / WRITINGS WRAPPER
-           ======================================== */
-        .editorial-container {
-            max-width: 800px;
-            margin: 60px auto 0 auto;
+        .commissions-container {
+            max-width: 1300px;
+            margin: 160px auto 80px;
             padding: 0 40px;
         }
 
-        .writing-panel { display: none; }
-        .writing-panel.active { display: block; }
-
-        /* ========================================
-           ESSAY CARD ARCHITECTURE
-           ======================================== */
-        .essay-card {
-            border-bottom: 1px solid #111;
-            padding: 40px 0;
-            transition: border-color 0.3s ease;
+        .commissions-content {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 80px;
+            align-items: start;
         }
 
-        .essay-card:last-child {
-            border-bottom: none;
+        /* Profile & Text Block (Left) */
+        .profile-sticky {
+            position: sticky;
+            top: 140px;
         }
 
-        .essay-meta {
+        .profile-photo-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .profile-photo-wrapper img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #111;
+            display: block;
+        }
+
+        .photo-caption {
+            margin-top: 12px;
             font-size: 11px;
-            color: #a88f5d;
+            color: #555555;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 15px;
         }
 
-        .essay-meta span.date {
-            color: #555;
+        .profile-sticky h1 {
+            font-size: 46px;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            line-height: 1.2;
         }
 
-        .essay-card h3 {
-            font-size: 26px;
-            color: #ffffff;
-            margin-bottom: 14px;
-            line-height: 1.3;
-            font-weight: 300;
-            transition: color 0.3s ease;
-        }
-
-        .essay-card:hover h3 {
-            color: #cccccc;
-        }
-
-        .essay-excerpt {
+        .profile-sticky .biography-text {
             font-size: 15px;
             color: #999999;
             line-height: 1.8;
-            margin-bottom: 20px;
             font-weight: 300;
             text-align: justify;
         }
 
-        .read-more-link {
+        .profile-sticky .biography-text p {
+            margin-bottom: 20px;
+        }
+
+        /* Interactive Form & Briefings (Right) */
+        .interactive-zone h2 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            border-bottom: 1px solid #111;
+            padding-bottom: 15px;
+        }
+
+        .services-directory {
+            margin-bottom: 50px;
+        }
+
+        .service-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #111;
+        }
+        .service-item:last-child { border-bottom: none; }
+
+        .service-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .service-header-row h3 {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .service-price {
+            font-family: 'Georgia', serif;
+            font-size: 16px;
+            color: #a88f5d;
+        }
+
+        .service-description {
+            font-size: 13px;
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        /* Minimalist Contact Form */
+        .contact-form-matrix {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .form-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-field-group label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a88f5d;
+        }
+
+        .form-field-group input,
+        .form-field-group select,
+        .form-field-group textarea {
+            background-color: #050505;
+            border: 1px solid #1a1a1a;
+            color: #ffffff;
+            padding: 14px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s ease, background-color 0.3s ease matrix;
+            outline: none;
+        }
+
+        .form-field-group input:focus,
+        .form-field-group select:focus,
+        .form-field-group textarea:focus {
+            border-color: #a88f5d;
+            background-color: #0a0a0a;
+        }
+
+        .form-field-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .submit-button-wrap {
+            margin-top: 15px;
+        }
+
+        .submit-btn {
+            background: none;
+            border: 1px solid #a88f5d;
+            color: #a88f5d;
+            padding: 16px 40px;
             font-size: 11px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: #ffffff;
-            border-bottom: 1px solid #333;
-            padding-bottom: 4px;
-            transition: border-color 0.3s ease, color 0.3s ease;
-            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            width: 100%;
         }
 
-        .essay-card:hover .read-more-link {
-            border-color: #a88f5d;
-            color: #a88f5d;
-        }
-
-        /* ========================================
-           COMMISSIONS / CONTACT CTA
-           ======================================== */
-        .commission-cta {
-            max-width: 1000px;
-            margin: 120px auto 0 auto;
-            padding: 70px 40px;
-            text-align: center;
-            border-top: 1px solid #111;
-            border-bottom: 1px solid #111;
-        }
-
-        .commission-cta h2 {
-            font-size: 30px;
-            letter-spacing: 1px;
-            margin-bottom: 18px;
-        }
-
-        .commission-cta p {
-            font-size: 14px;
-            color: #999999;
-            letter-spacing: 0.5px;
-            line-height: 1.9;
-            max-width: 640px;
-            margin: 0 auto 30px auto;
-        }
-
-        .commission-cta .cta-button {
-            display: inline-block;
-            padding: 16px 36px;
-            border: 1px solid #a88f5d;
-            color: #a88f5d;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        .commission-cta .cta-button:hover {
+        .submit-btn:hover {
             background-color: #a88f5d;
             color: #000000;
+        }
+
+        .direct-mail-fallback {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #555555;
+        }
+
+        .direct-mail-fallback a {
+            color: #ffffff;
+            text-decoration: underline;
         }
 
         /* ========================================
@@ -319,7 +313,7 @@
             text-align: center;
             padding: 60px 40px;
             border-top: 1px solid #111;
-            margin-top: 80px;
+            margin-top: 100px;
         }
 
         footer .footer-bio {
@@ -335,16 +329,17 @@
             color: #444444;
             letter-spacing: 2px;
             text-transform: uppercase;
-            font-weight: 400;
         }
 
         /* ========================================
-           RESPONSIVE SYSTEM
+           RESPONSIVE ARCHITECTURE
            ======================================== */
         @media (max-width: 1024px) {
             nav .container { padding: 0 30px; }
-            .page-header { padding: 80px 30px 30px 30px; }
-            .page-header h1 { font-size: 40px; }
+            .commissions-container { padding: 0 30px; margin-top: 120px; }
+            .commissions-content { grid-template-columns: 1fr; gap: 60px; }
+            .profile-sticky { position: static; max-width: 700px; margin: 0 auto; }
+            .interactive-zone { max-width: 700px; margin: 0 auto; width: 100%; }
         }
 
         @media (max-width: 768px) {
@@ -366,21 +361,10 @@
             nav ul li a { font-size: 16px; letter-spacing: 3px; }
             .menu-toggle { display: flex; }
 
-            .page-header { margin-top: 90px; padding: 40px 20px; }
-            .page-header h1 { font-size: 32px; letter-spacing: 1px; }
-            .page-header .subtitle { font-size: 11px; letter-spacing: 2px; }
-
-            .series-tabs { gap: 12px; padding: 0 20px; }
-            .series-tab { font-size: 11px; padding: 12px 2px; }
-
-            .editorial-container { padding: 0 20px; margin-top: 30px; }
-            .essay-card { padding: 30px 0; }
-            .essay-card h3 { font-size: 22px; }
-            .essay-excerpt { font-size: 14px; text-align: left; }
-
-            .commission-cta { margin-top: 80px; padding: 50px 20px; }
-            .commission-cta h2 { font-size: 24px; }
-
+            .commissions-container { padding: 0 20px; margin-top: 100px; }
+            .profile-sticky h1 { font-size: 32px; text-align: center; }
+            .interactive-zone h2 { font-size: 20px; }
+            
             footer { padding: 50px 20px; }
         }
     </style>
@@ -404,144 +388,126 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="art.html">Fine Art</a></li>
                 <li><a href="photography.html">Photography</a></li>
-                <li><a href="escritos.html" class="active">Escritos (Español)</a></li>
-                <li><a href="commissions.html" class="cta-nav">Commissions & Contact</a></li>
+                <li><a href="escritos.html">Escritos (Español)</a></li>
+                <li><a href="commissions.html" class="cta-nav active">Commissions & Contact</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- ========================================
-         PAGE HEADER
+         COMMISSIONS & ABOUT MAIN BLOCK
     ======================================== -->
-    <section class="page-header">
-        <h1>Escritos</h1>
-        <p class="subtitle">Crónicas, Ensayos de Arte y Crítica Cultural</p>
-    </section>
+    <main class="commissions-container">
+        <div class="commissions-content">
+            
+            <!-- Left Column: Sticky Identity Profile -->
+            <aside class="profile-sticky">
+                <div class="profile-photo-wrapper">
+                    <img id="portraitImage" alt="Martin Cueva Portrait" />
+                    <p class="photo-caption" id="portraitCaption"></p>
+                </div>
+                <h1>About & Inquiries</h1>
+                <div class="biography-text">
+                    <p>I am a multidisciplinary artist working across fine art photography, painting, drawing, and literature. My practice resists categorization: visually eclectic and intellectually driven, my writing moves fluidly between poetry, essays, short fiction, and philosophical and scientific inquiry.[span_2](start_span)[span_2](end_span)</p>
+                    <p>As a self-taught creator with the spirit of an Enlightenment polymath, I am guided by an uncompromising pursuit of the unfamiliar. My work emerges from a deep fascination with the rare, the unconventional, and the non-standard—an exploration of creativity unbound by norms.[span_3](start_span)[span_3](end_span)</p>
+                </div>
+            </aside>
 
-    <!-- ========================================
-         SERIES TABS (CATEGORIES)
-    ======================================== -->
-    <nav class="series-tabs" id="categoryTabs" aria-label="Categorías de escritos">
-        <!-- Inyectado dinámicamente mediante JS -->
-    </nav>
+            <!-- Right Column: Operational Form & Directories -->
+            <section class="interactive-zone">
+                
+                <h2>Commission Directories</h2>
+                <div class="services-directory">
+                    <div class="service-item">
+                        <div class="service-header-row">
+                            <h3>Fine Art & Mixed Media Commissions</h3>
+                            <span class="service-price">By Project</span>
+                        </div>
+                        <p class="service-description">Original drawing, traditional oil paintings, and avant-garde mixed media configurations custom-tailored for global private collectors. Available international shipping.</p>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-header-row">
+                            <h3>Curated Portraiture & Landscapes</h3>
+                            <span class="service-price">By Assignment</span>
+                        </div>
+                        <p class="service-description">Editorial, corporate, and fine art analog or digital photography sessions. Based between Florida and Latin America, traveling worldwide for specific installations.</p>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-header-row">
+                            <h3>Editorial Writing & Cultural Critique</h3>
+                            <span class="service-price">By Request</span>
+                        </div>
+                        <p class="service-description">Curation of exhibition catalogs, deep essays regarding philosophy and art, and analytical contributions designed for rigorous printed media channels.</p>
+                    </div>
+                </div>
 
-    <!-- ========================================
-         EDITORIAL CONTENT FEED
-    ======================================== -->
-    <div class="editorial-container" id="editorialFeed">
-        <!-- Inyectado dinámicamente mediante JS -->
-    </div>
+                <h2>Project Briefing Request</h2>
+                <form class="contact-form-matrix" action="https://formspree.io/f/YOUR_FORMSPREE_ID_HERE" method="POST">
+                    <div class="form-field-group">
+                        <label for="clientName">Full Name / Institution</label>
+                        <input type="text" id="clientName" name="name" required placeholder="e.g., Julian Mason" />
+                    </div>
 
-    <!-- ========================================
-         COMMISSIONS / CONTACT CTA
-    ======================================== -->
-    <section class="commission-cta">
-        <h2>Colaboraciones Editoriales & Ensayos</h2>
-        <p>Disponible para la redacción de textos críticos de arte, ensayos curatoriales, colaboraciones literarias y piezas de periodismo cultural profundo para publicaciones impresas o digitales.</p>
-        <a href="commissions.html" class="cta-button">Solicitar una Colaboración</a>
-    </section>
+                    <div class="form-field-group">
+                        <label for="clientEmail">Email Address</label>
+                        <input type="email" id="clientEmail" name="email" required placeholder="name@domain.com" />
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="projectType">Nature of Assignment</label>
+                        <select id="projectType" name="assignment_type" required>
+                            <option value="" disabled selected>Select an assignment profile...</option>
+                            <option value="fine_art">Fine Art & Painting Commission</option>
+                            <option value="photography">Photography Session / Editorial Assignment</option>
+                            <option value="editorial">Literary & Cultural Essay Request</option>
+                            <option value="other">Other Unique Collaborative Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="projectBrief">Project Brief & Specifications</label>
+                        <textarea id="projectBrief" name="message" required placeholder="Please state the conceptual requirements, approximate timeline, and dimensional specifications..."></textarea>
+                    </div>
+
+                    <div class="submit-button-wrap">
+                        <button type="submit" class="submit-btn">Transmit Project Brief ↗</button>
+                    </div>
+
+                    <div class="direct-mail-fallback">
+                        Direct transmission fallback protocol: 
+                        <a href="mailto:martincueva.art@gmail.com">martincueva.art@gmail.com</a>[span_4](start_span)[span_4](end_span)
+                    </div>
+                </form>
+
+            </section>
+        </div>
+    </main>
 
     <!-- ========================================
          FOOTER
     ======================================== -->
     <footer>
-        <p class="footer-bio">Martin Cueva es un artista visual y escritor especializado en comisiones de bellas artes, fotografía curada de paisaje y retrato, y análisis cultural para el periodismo de opinión.</p>
-        <p class="copyright">© Martin Cueva — Todos los Derechos Reservados</p>
+        <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.[span_5](start_span)[span_5](end_span)</p>
+        <p class="copyright">© MARTIN CUEVA — ALL RIGHTS RESERVED</p>
     </footer>
 
     <!-- ========================================
-         JAVASCRIPT PROCESSING ENGINE
+         JAVASCRIPT RUNTIME
     ======================================== -->
     <script>
         /* ========================================================================
-           LITERARY MASTER ARCHIVE — CONFIGURATION MATRIX
+           📸 ARCHIVAL PHOTO MATRIX CONFIGURATION
            ======================================================================== */
-        const ESCRITOS_ARCHIVE = [
-            {
-                id: "ensayos",
-                tabLabel: "Ensayos Críticos",
-                articles: [
-                    {
-                        title: "La Estética del Silencio en la Arquitectura Latinoamericana",
-                        date: "Marzo, 2026",
-                        meta: "Ensayo Curatorial",
-                        excerpt: "Un examen analítico sobre cómo los vacíos espaciales y la luz natural actúan como elementos discursivos en el tejido urbano contemporáneo, redefiniendo nuestra identidad continental.",
-                        link: "articulos/estetica-del-silencio.html"
-                    },
-                    {
-                        title: "De la Pigmentación a la Memoria Análoga",
-                        date: "Noviembre, 2025",
-                        meta: "Crítica de Arte",
-                        excerpt: "Una exploración filosófica respecto al desplazamiento transicional del lienzo tradicional hacia la fijeza química de la luz en la fotografía de emulsión.",
-                        link: "articulos/pigmentacion-memoria.html"
-                    }
-                ]
-            },
-            {
-                id: "cronicas",
-                tabLabel: "Crónicas & Columnas",
-                articles: [
-                    {
-                        title: "Andes Imprevistos: Fragmentos de un Viaje a través de la Bruma",
-                        date: "Enero, 2026",
-                        meta: "Crónica Cultural",
-                        excerpt: "Notas marginales redactadas durante las expediciones de campo, donde la geografía abrupta dialoga de manera perenne con el aislamiento y la herencia mística de los pueblos andinos.",
-                        link: "articulos/andes-imprevistos.html"
-                    }
-                ]
-            }
-        ];
+        const CONFIG = {
+            portraitImage: 'Portrait.jpg', //[span_6](start_span)[span_6](end_span)
+            portraitCaption: 'Portrait, 2024' //[span_7](start_span)[span_7](end_span)
+        };
 
-        let activeCategoryId = ESCRITOS_ARCHIVE[0].id;
-
-        const tabsEl = document.getElementById("categoryTabs");
-        const feedEl = document.getElementById("editorialFeed");
-
-        function renderCategories() {
-            tabsEl.innerHTML = "";
-            ESCRITOS_ARCHIVE.forEach((cat) => {
-                const btn = document.createElement("button");
-                btn.className = "series-tab" + (cat.id === activeCategoryId ? " active" : "");
-                btn.textContent = cat.tabLabel;
-                btn.type = "button";
-                btn.addEventListener("click", () => switchCategory(cat.id));
-                tabsEl.appendChild(btn);
-            });
-        }
-
-        function renderFeed() {
-            feedEl.innerHTML = "";
-            ESCRITOS_ARCHIVE.forEach((cat) => {
-                const panel = document.createElement("div");
-                panel.className = "writing-panel" + (cat.id === activeCategoryId ? " active" : "");
-                panel.id = "panel-" + cat.id;
-
-                cat.articles.forEach((art) => {
-                    const card = document.createElement("article");
-                    card.className = "essay-card";
-
-                    card.innerHTML = `
-                        <div class="essay-meta">
-                            <span>${art.meta}</span>
-                            <span class="date">— ${art.date}</span>
-                        </div>
-                        <h3>${art.title}</h3>
-                        <p class="essay-excerpt">${art.excerpt}</p>
-                        <a href="${art.link}" class="read-more-link">Leer Texto Integrado ↗</a>
-                    `;
-                    panel.appendChild(card);
-                });
-
-                feedEl.appendChild(panel);
-            });
-        }
-
-        function switchCategory(id) {
-            activeCategoryId = id;
-            renderCategories();
-            document.querySelectorAll(".writing-panel").forEach((p) => {
-                p.classList.toggle("active", p.id === "panel-" + id);
-            });
+        function loadPortraitData() {
+            const imgEl = document.getElementById('portraitImage');
+            const capEl = document.getElementById('portraitCaption');
+            if (imgEl) imgEl.src = CONFIG.portraitImage;
+            if (capEl) capEl.textContent = CONFIG.portraitCaption;
         }
 
         function toggleMenu() {
@@ -550,8 +516,7 @@
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            renderCategories();
-            renderFeed();
+            loadPortraitData();
 
             document.querySelectorAll("#menu a").forEach((link) => {
                 link.addEventListener("click", () => {
@@ -562,5 +527,4 @@
         });
     </script>
 </body>
-  </html>
-  
+</html>
