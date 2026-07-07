@@ -135,7 +135,7 @@
             align-items: start;
         }
 
-        /* Profile & Text Block (Left) */
+        /* Profile & Text Block (Left Column) */
         .profile-sticky {
             position: sticky;
             top: 140px;
@@ -179,7 +179,7 @@
             margin-bottom: 20px;
         }
 
-        /* Interactive Form & Briefings (Right) */
+        /* Directories & Direct Inquiries (Right Column) */
         .interactive-zone h2 {
             font-size: 24px;
             font-weight: 300;
@@ -191,7 +191,7 @@
         }
 
         .services-directory {
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         .service-item {
@@ -214,96 +214,44 @@
             color: #ffffff;
         }
 
-        .service-price {
-            font-family: 'Georgia', serif;
-            font-size: 16px;
-            color: #a88f5d;
-        }
-
         .service-description {
             font-size: 13px;
             color: #666666;
             line-height: 1.6;
         }
 
-        /* Minimalist Contact Form */
-        .contact-form-matrix {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        /* Minimalist Communications Area */
+        .contact-channel-block {
+            background-color: #050505;
+            border: 1px solid #111;
+            padding: 40px;
+            text-align: center;
             margin-top: 20px;
         }
 
-        .form-field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-field-group label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #a88f5d;
-        }
-
-        .form-field-group input,
-        .form-field-group select,
-        .form-field-group textarea {
-            background-color: #050505;
-            border: 1px solid #1a1a1a;
-            color: #ffffff;
-            padding: 14px;
-            font-family: inherit;
+        .contact-channel-block p {
             font-size: 14px;
-            transition: border-color 0.3s ease, background-color 0.3s ease matrix;
-            outline: none;
+            color: #999999;
+            letter-spacing: 0.5px;
+            margin-bottom: 25px;
+            font-weight: 300;
         }
 
-        .form-field-group input:focus,
-        .form-field-group select:focus,
-        .form-field-group textarea:focus {
-            border-color: #a88f5d;
-            background-color: #0a0a0a;
-        }
-
-        .form-field-group textarea {
-            resize: vertical;
-            min-height: 140px;
-        }
-
-        .submit-button-wrap {
-            margin-top: 15px;
-        }
-
-        .submit-btn {
-            background: none;
+        .email-anchor-btn {
+            display: inline-block;
             border: 1px solid #a88f5d;
             color: #a88f5d;
             padding: 16px 40px;
-            font-size: 11px;
+            font-size: 12px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            cursor: pointer;
+            font-weight: 400;
             transition: background-color 0.3s ease, color 0.3s ease;
-            width: 100%;
         }
 
-        .submit-btn:hover {
+        .email-anchor-btn:hover {
             background-color: #a88f5d;
             color: #000000;
-        }
-
-        .direct-mail-fallback {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 13px;
-            color: #555555;
-        }
-
-        .direct-mail-fallback a {
-            color: #ffffff;
-            text-decoration: underline;
         }
 
         /* ========================================
@@ -364,6 +312,7 @@
             .commissions-container { padding: 0 20px; margin-top: 100px; }
             .profile-sticky h1 { font-size: 32px; text-align: center; }
             .interactive-zone h2 { font-size: 20px; }
+            .contact-channel-block { padding: 30px 20px; }
             
             footer { padding: 50px 20px; }
         }
@@ -371,9 +320,6 @@
 </head>
 <body>
 
-    <!-- ========================================
-         NAVIGATION BAR
-    ======================================== -->
     <nav>
         <div class="container">
             <a href="index.html" class="logo brand-title">Martin Cueva</a>
@@ -394,13 +340,9 @@
         </div>
     </nav>
 
-    <!-- ========================================
-         COMMISSIONS & ABOUT MAIN BLOCK
-    ======================================== -->
     <main class="commissions-container">
         <div class="commissions-content">
             
-            <!-- Left Column: Sticky Identity Profile -->
             <aside class="profile-sticky">
                 <div class="profile-photo-wrapper">
                     <img id="portraitImage" alt="Martin Cueva Portrait" />
@@ -408,12 +350,11 @@
                 </div>
                 <h1>About & Inquiries</h1>
                 <div class="biography-text">
-                    <p>I am a multidisciplinary artist working across fine art photography, painting, drawing, and literature. My practice resists categorization: visually eclectic and intellectually driven, my writing moves fluidly between poetry, essays, short fiction, and philosophical and scientific inquiry.[span_2](start_span)[span_2](end_span)</p>
-                    <p>As a self-taught creator with the spirit of an Enlightenment polymath, I am guided by an uncompromising pursuit of the unfamiliar. My work emerges from a deep fascination with the rare, the unconventional, and the non-standard—an exploration of creativity unbound by norms.[span_3](start_span)[span_3](end_span)</p>
+                    <p>I am a multidisciplinary artist working across fine art photography, painting, drawing, and literature. My practice resists categorization: visually eclectic and intellectually driven, my writing moves fluidly between poetry, essays, short fiction, and philosophical and scientific inquiry.</p>
+                    <p>As a self-taught creator with the spirit of an Enlightenment polymath, I am guided by an uncompromising pursuit of the unfamiliar. My work emerges from a deep fascination with the rare, the unconventional, and the non-standard—an exploration of creativity unbound by norms.</p>
                 </div>
             </aside>
 
-            <!-- Right Column: Operational Form & Directories -->
             <section class="interactive-zone">
                 
                 <h2>Commission Directories</h2>
@@ -421,86 +362,45 @@
                     <div class="service-item">
                         <div class="service-header-row">
                             <h3>Fine Art & Mixed Media Commissions</h3>
-                            <span class="service-price">By Project</span>
                         </div>
                         <p class="service-description">Original drawing, traditional oil paintings, and avant-garde mixed media configurations custom-tailored for global private collectors. Available international shipping.</p>
                     </div>
                     <div class="service-item">
                         <div class="service-header-row">
                             <h3>Curated Portraiture & Landscapes</h3>
-                            <span class="service-price">By Assignment</span>
                         </div>
                         <p class="service-description">Editorial, corporate, and fine art analog or digital photography sessions. Based between Florida and Latin America, traveling worldwide for specific installations.</p>
                     </div>
                     <div class="service-item">
                         <div class="service-header-row">
                             <h3>Editorial Writing & Cultural Critique</h3>
-                            <span class="service-price">By Request</span>
                         </div>
                         <p class="service-description">Curation of exhibition catalogs, deep essays regarding philosophy and art, and analytical contributions designed for rigorous printed media channels.</p>
                     </div>
                 </div>
 
-                <h2>Project Briefing Request</h2>
-                <form class="contact-form-matrix" action="https://formspree.io/f/YOUR_FORMSPREE_ID_HERE" method="POST">
-                    <div class="form-field-group">
-                        <label for="clientName">Full Name / Institution</label>
-                        <input type="text" id="clientName" name="name" required placeholder="e.g., Julian Mason" />
-                    </div>
-
-                    <div class="form-field-group">
-                        <label for="clientEmail">Email Address</label>
-                        <input type="email" id="clientEmail" name="email" required placeholder="name@domain.com" />
-                    </div>
-
-                    <div class="form-field-group">
-                        <label for="projectType">Nature of Assignment</label>
-                        <select id="projectType" name="assignment_type" required>
-                            <option value="" disabled selected>Select an assignment profile...</option>
-                            <option value="fine_art">Fine Art & Painting Commission</option>
-                            <option value="photography">Photography Session / Editorial Assignment</option>
-                            <option value="editorial">Literary & Cultural Essay Request</option>
-                            <option value="other">Other Unique Collaborative Inquiry</option>
-                        </select>
-                    </div>
-
-                    <div class="form-field-group">
-                        <label for="projectBrief">Project Brief & Specifications</label>
-                        <textarea id="projectBrief" name="message" required placeholder="Please state the conceptual requirements, approximate timeline, and dimensional specifications..."></textarea>
-                    </div>
-
-                    <div class="submit-button-wrap">
-                        <button type="submit" class="submit-btn">Transmit Project Brief ↗</button>
-                    </div>
-
-                    <div class="direct-mail-fallback">
-                        Direct transmission fallback protocol: 
-                        <a href="mailto:martincueva.art@gmail.com">martincueva.art@gmail.com</a>[span_4](start_span)[span_4](end_span)
-                    </div>
-                </form>
+                <h2>Project Inquiries</h2>
+                <div class="contact-channel-block">
+                    <p>For fine art acquisitions, archival print catalog orders, or collaborative editorial project proposals, please initiate formal communication via electronic mail.</p>
+                    <a href="mailto:martincueva.art@gmail.com" class="email-anchor-btn">martincueva.art@gmail.com</a>
+                </div>
 
             </section>
         </div>
     </main>
 
-    <!-- ========================================
-         FOOTER
-    ======================================== -->
     <footer>
-        <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.[span_5](start_span)[span_5](end_span)</p>
+        <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.</p>
         <p class="copyright">© MARTIN CUEVA — ALL RIGHTS RESERVED</p>
     </footer>
 
-    <!-- ========================================
-         JAVASCRIPT RUNTIME
-    ======================================== -->
     <script>
         /* ========================================================================
            📸 ARCHIVAL PHOTO MATRIX CONFIGURATION
            ======================================================================== */
         const CONFIG = {
-            portraitImage: 'Portrait.jpg', //[span_6](start_span)[span_6](end_span)
-            portraitCaption: 'Portrait, 2024' //[span_7](start_span)[span_7](end_span)
+            portraitImage: 'Portrait.jpg', 
+            portraitCaption: 'Portrait, 2024' 
         };
 
         function loadPortraitData() {
