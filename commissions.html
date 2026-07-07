@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escritos & Columnas Editoriales | Martin Cueva</title>
+
+    <style>
+        /* ========================================
+           GLOBAL STYLES & TYPOGRAPHY
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { 
+            color: inherit; 
+            text-decoration: none; 
+        }
+
+        h1, h2, h3, .brand-title {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: 300;
+        }
+
+        /* ========================================
+           NAVIGATION BAR
+           ======================================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            padding: 25px 0;
+            z-index: 1000;
+            border-bottom: 1px solid #111;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .logo {
+            font-size: 22px;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+        .logo:hover { opacity: 0.7; }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 35px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: #ffffff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #ffffff;
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a.active::after,
+        nav ul li a:hover::after { width: 100%; }
+        nav ul li a.active { color: #cccccc; }
+        nav ul li a:hover { color: #cccccc; }
+
+        nav ul li a.cta-nav { color: #a88f5d; }
+        nav ul li a.cta-nav::after { background-color: #a88f5d; }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 28px;
+            height: 2px;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        /* ========================================
+           PAGE HEADER
+           ======================================== */
+        .page-header {
+            margin-top: 140px;
+            padding: 100px 40px 40px 40px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header h1 {
+            font-size: 52px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+
+        .page-header .subtitle {
+            font-size: 13px;
+            color: #888888;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+            line-height: 2;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* ========================================
+           CATEGORIES TAB SWITCHER
+           ======================================== */
+        .series-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 50px auto 0 auto;
+            padding: 0 40px;
+            border-bottom: 1px solid #1a1a1a;
+            max-width: 1000px;
+        }
+
+        .series-tab {
+            background: none;
+            border: none;
+            color: #777777;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 16px 4px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .series-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #a88f5d;
+            transition: width 0.3s ease;
+        }
+
+        .series-tab.active { color: #ffffff; }
+        .series-tab.active::after { width: 100%; }
+        .series-tab:hover { color: #ffffff; }
+
+        /* ========================================
+           EDITORIAL FEED / WRITINGS WRAPPER
+           ======================================== */
+        .editorial-container {
+            max-width: 800px;
+            margin: 60px auto 0 auto;
+            padding: 0 40px;
+        }
+
+        .writing-panel { display: none; }
+        .writing-panel.active { display: block; }
+
+        /* ========================================
+           ESSAY CARD ARCHITECTURE
+           ======================================== */
+        .essay-card {
+            border-bottom: 1px solid #111;
+            padding: 40px 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .essay-card:last-child {
+            border-bottom: none;
+        }
+
+        .essay-meta {
+            font-size: 11px;
+            color: #a88f5d;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .essay-meta span.date {
+            color: #555;
+        }
+
+        .essay-card h3 {
+            font-size: 26px;
+            color: #ffffff;
+            margin-bottom: 14px;
+            line-height: 1.3;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .essay-card:hover h3 {
+            color: #cccccc;
+        }
+
+        .essay-excerpt {
+            font-size: 15px;
+            color: #999999;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-weight: 300;
+            text-align: justify;
+        }
+
+        .read-more-link {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+            transition: border-color 0.3s ease, color 0.3s ease;
+            display: inline-block;
+        }
+
+        .essay-card:hover .read-more-link {
+            border-color: #a88f5d;
+            color: #a88f5d;
+        }
+
+        /* ========================================
+           COMMISSIONS / CONTACT CTA
+           ======================================== */
+        .commission-cta {
+            max-width: 1000px;
+            margin: 120px auto 0 auto;
+            padding: 70px 40px;
+            text-align: center;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+        }
+
+        .commission-cta h2 {
+            font-size: 30px;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .commission-cta p {
+            font-size: 14px;
+            color: #999999;
+            letter-spacing: 0.5px;
+            line-height: 1.9;
+            max-width: 640px;
+            margin: 0 auto 30px auto;
+        }
+
+        .commission-cta .cta-button {
+            display: inline-block;
+            padding: 16px 36px;
+            border: 1px solid #a88f5d;
+            color: #a88f5d;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .commission-cta .cta-button:hover {
+            background-color: #a88f5d;
+            color: #000000;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        footer {
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 1px solid #111;
+            margin-top: 80px;
+        }
+
+        footer .footer-bio {
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+            font-size: 13px;
+            color: #777777;
+            line-height: 1.8;
+        }
+
+        footer p.copyright {
+            font-size: 10px;
+            color: #444444;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        /* ========================================
+           RESPONSIVE SYSTEM
+           ======================================== */
+        @media (max-width: 1024px) {
+            nav .container { padding: 0 30px; }
+            .page-header { padding: 80px 30px 30px 30px; }
+            .page-header h1 { font-size: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 20px 0; }
+            nav .container { padding: 0 20px; }
+
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background-color: rgba(0, 0, 0, 0.98);
+                padding: 120px 40px;
+                gap: 35px;
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+            nav ul.active { display: flex; }
+            nav ul li a { font-size: 16px; letter-spacing: 3px; }
+            .menu-toggle { display: flex; }
+
+            .page-header { margin-top: 90px; padding: 40px 20px; }
+            .page-header h1 { font-size: 32px; letter-spacing: 1px; }
+            .page-header .subtitle { font-size: 11px; letter-spacing: 2px; }
+
+            .series-tabs { gap: 12px; padding: 0 20px; }
+            .series-tab { font-size: 11px; padding: 12px 2px; }
+
+            .editorial-container { padding: 0 20px; margin-top: 30px; }
+            .essay-card { padding: 30px 0; }
+            .essay-card h3 { font-size: 22px; }
+            .essay-excerpt { font-size: 14px; text-align: left; }
+
+            .commission-cta { margin-top: 80px; padding: 50px 20px; }
+            .commission-cta h2 { font-size: 24px; }
+
+            footer { padding: 50px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================
+         NAVIGATION BAR
+    ======================================== -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo brand-title">Martin Cueva</a>
+
+            <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Navigation Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <ul id="menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="art.html">Fine Art</a></li>
+                <li><a href="photography.html">Photography</a></li>
+                <li><a href="escritos.html" class="active">Escritos (Español)</a></li>
+                <li><a href="commissions.html" class="cta-nav">Commissions & Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ========================================
+         PAGE HEADER
+    ======================================== -->
+    <section class="page-header">
+        <h1>Escritos</h1>
+        <p class="subtitle">Crónicas, Ensayos de Arte y Crítica Cultural</p>
+    </section>
+
+    <!-- ========================================
+         SERIES TABS (CATEGORIES)
+    ======================================== -->
+    <nav class="series-tabs" id="categoryTabs" aria-label="Categorías de escritos">
+        <!-- Inyectado dinámicamente mediante JS -->
+    </nav>
+
+    <!-- ========================================
+         EDITORIAL CONTENT FEED
+    ======================================== -->
+    <div class="editorial-container" id="editorialFeed">
+        <!-- Inyectado dinámicamente mediante JS -->
+    </div>
+
+    <!-- ========================================
+         COMMISSIONS / CONTACT CTA
+    ======================================== -->
+    <section class="commission-cta">
+        <h2>Colaboraciones Editoriales & Ensayos</h2>
+        <p>Disponible para la redacción de textos críticos de arte, ensayos curatoriales, colaboraciones literarias y piezas de periodismo cultural profundo para publicaciones impresas o digitales.</p>
+        <a href="commissions.html" class="cta-button">Solicitar una Colaboración</a>
+    </section>
+
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+    <footer>
+        <p class="footer-bio">Martin Cueva es un artista visual y escritor especializado en comisiones de bellas artes, fotografía curada de paisaje y retrato, y análisis cultural para el periodismo de opinión.</p>
+        <p class="copyright">© Martin Cueva — Todos los Derechos Reservados</p>
+    </footer>
+
+    <!-- ========================================
+         JAVASCRIPT PROCESSING ENGINE
+    ======================================== -->
+    <script>
+        /* ========================================================================
+           LITERARY MASTER ARCHIVE — CONFIGURATION MATRIX
+           ======================================================================== */
+        const ESCRITOS_ARCHIVE = [
+            {
+                id: "ensayos",
+                tabLabel: "Ensayos Críticos",
+                articles: [
+                    {
+                        title: "La Estética del Silencio en la Arquitectura Latinoamericana",
+                        date: "Marzo, 2026",
+                        meta: "Ensayo Curatorial",
+                        excerpt: "Un examen analítico sobre cómo los vacíos espaciales y la luz natural actúan como elementos discursivos en el tejido urbano contemporáneo, redefiniendo nuestra identidad continental.",
+                        link: "articulos/estetica-del-silencio.html"
+                    },
+                    {
+                        title: "De la Pigmentación a la Memoria Análoga",
+                        date: "Noviembre, 2025",
+                        meta: "Crítica de Arte",
+                        excerpt: "Una exploración filosófica respecto al desplazamiento transicional del lienzo tradicional hacia la fijeza química de la luz en la fotografía de emulsión.",
+                        link: "articulos/pigmentacion-memoria.html"
+                    }
+                ]
+            },
+            {
+                id: "cronicas",
+                tabLabel: "Crónicas & Columnas",
+                articles: [
+                    {
+                        title: "Andes Imprevistos: Fragmentos de un Viaje a través de la Bruma",
+                        date: "Enero, 2026",
+                        meta: "Crónica Cultural",
+                        excerpt: "Notas marginales redactadas durante las expediciones de campo, donde la geografía abrupta dialoga de manera perenne con el aislamiento y la herencia mística de los pueblos andinos.",
+                        link: "articulos/andes-imprevistos.html"
+                    }
+                ]
+            }
+        ];
+
+        let activeCategoryId = ESCRITOS_ARCHIVE[0].id;
+
+        const tabsEl = document.getElementById("categoryTabs");
+        const feedEl = document.getElementById("editorialFeed");
+
+        function renderCategories() {
+            tabsEl.innerHTML = "";
+            ESCRITOS_ARCHIVE.forEach((cat) => {
+                const btn = document.createElement("button");
+                btn.className = "series-tab" + (cat.id === activeCategoryId ? " active" : "");
+                btn.textContent = cat.tabLabel;
+                btn.type = "button";
+                btn.addEventListener("click", () => switchCategory(cat.id));
+                tabsEl.appendChild(btn);
+            });
+        }
+
+        function renderFeed() {
+            feedEl.innerHTML = "";
+            ESCRITOS_ARCHIVE.forEach((cat) => {
+                const panel = document.createElement("div");
+                panel.className = "writing-panel" + (cat.id === activeCategoryId ? " active" : "");
+                panel.id = "panel-" + cat.id;
+
+                cat.articles.forEach((art) => {
+                    const card = document.createElement("article");
+                    card.className = "essay-card";
+
+                    card.innerHTML = `
+                        <div class="essay-meta">
+                            <span>${art.meta}</span>
+                            <span class="date">— ${art.date}</span>
+                        </div>
+                        <h3>${art.title}</h3>
+                        <p class="essay-excerpt">${art.excerpt}</p>
+                        <a href="${art.link}" class="read-more-link">Leer Texto Integrado ↗</a>
+                    `;
+                    panel.appendChild(card);
+                });
+
+                feedEl.appendChild(panel);
+            });
+        }
+
+        function switchCategory(id) {
+            activeCategoryId = id;
+            renderCategories();
+            document.querySelectorAll(".writing-panel").forEach((p) => {
+                p.classList.toggle("active", p.id === "panel-" + id);
+            });
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById("menu");
+            if (menu) menu.classList.toggle("active");
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderCategories();
+            renderFeed();
+
+            document.querySelectorAll("#menu a").forEach((link) => {
+                link.addEventListener("click", () => {
+                    const menu = document.getElementById("menu");
+                    if (menu) menu.classList.remove("active");
+                });
+            });
+        });
+    </script>
+</body>
+  </html>
+  
