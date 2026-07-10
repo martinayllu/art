@@ -6,13 +6,31 @@
     <title>Martin Cueva | Fine Art, Photography & Editorial Essays</title>
 
     <!-- ========================================
+         FAVICON
+    ======================================== -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="favicon.png" />
+
+    <!-- ========================================
+         GOOGLE ANALYTICS (gtag.js)
+    ======================================== -->
+    gtag/js?id=G-FN3LZS7GVN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-FN3LZS7GVN');
+    </script>
+
+    <!-- ========================================
          SEO META TAGS
     ======================================== -->
     <meta name="description" content="Martin Cueva — visual artist and writer. Original fine art, limited edition photography prints, custom commissions, and Spanish-language editorial essays." />
     <meta name="keywords" content="Martin Cueva, fine art, photography, art commissions, portrait commissions, Spanish editorial, escritos, ensayos, visual artist, limited edition prints" />
     <meta name="author" content="Martin Cueva" />
     <meta name="robots" content="index, follow" />
-    .html" />
+    https://www.martincueva.art/index.html
 
     <!-- ========================================
          OPEN GRAPH (Facebook, LinkedIn, WhatsApp)
@@ -36,7 +54,6 @@
 
     <!-- ========================================
          STRUCTURED DATA (JSON-LD) — Person + Website
-         Helps Google display rich results
     ======================================== -->
     <script type="application/ld+json">
     {
@@ -70,7 +87,6 @@
     <style>
         /* ========================================
            GLOBAL STYLES & TYPOGRAPHY
-           Updated to establish an editorial, gallery-grade tone.
         ======================================== */
         * {
             margin: 0;
@@ -85,7 +101,6 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
-        /* Serif Font for Elegant Editorial Headers */
         h1, h2, h3, .brand-title {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-weight: 300;
@@ -113,9 +128,6 @@
             align-items: center;
             padding: 0 40px;
         }
-        /* ========================================
-           LOGO SECTION
-        ======================================== */
         .logo {
             font-size: 22px;
             letter-spacing: 4px;
@@ -127,9 +139,6 @@
         .logo:hover {
             opacity: 0.7;
         }
-        /* ========================================
-           NAVIGATION MENU (Optimized Site Map)
-        ======================================== */
         nav ul {
             list-style: none;
             display: flex;
@@ -162,9 +171,8 @@
         nav ul li a:hover {
             color: #cccccc;
         }
-        /* Special Highlight for the Conversion Page */
         nav ul li a.cta-nav {
-            color: #a88f5d; /* Sophisticated Muted Gold */
+            color: #a88f5d;
         }
         nav ul li a.cta-nav::after {
             background-color: #a88f5d;
@@ -186,7 +194,7 @@
             transition: all 0.3s ease;
         }
         /* ========================================
-           HERO SECTION (Value Proposition Anchor)
+           HERO SECTION
         ======================================== */
         .hero {
             margin-top: 140px;
@@ -214,7 +222,7 @@
             margin: 0 auto;
         }
         /* ========================================
-           COMMERCIAL PILLARS (Consolidated Gateways)
+           COMMERCIAL PILLARS
         ======================================== */
         .gallery {
             max-width: 1400px;
@@ -227,7 +235,7 @@
         .gallery-item {
             position: relative;
             overflow: hidden;
-            aspect-ratio: 4/5; /* Taller format for fine art / editorial structure */
+            aspect-ratio: 4/5;
             background-color: #0a0a0a;
             cursor: pointer;
             border: 1px solid #111;
@@ -252,7 +260,6 @@
             transform: scale(1.04);
             opacity: 0.95;
         }
-        /* Permanent Elegant Overlay Text Structure */
         .gallery-item .caption {
             position: absolute;
             bottom: 0;
@@ -276,7 +283,6 @@
             font-weight: 400;
             margin-bottom: 15px;
         }
-        /* Action-oriented secondary button styling inside the cards */
         .gallery-item .action-text {
             font-size: 11px;
             letter-spacing: 1px;
@@ -318,37 +324,25 @@
             font-weight: 400;
         }
         /* ========================================
-           RESPONSIVE DESIGN - TABLET
+           RESPONSIVE - TABLET
         ======================================== */
         @media (max-width: 1024px) {
-            nav .container {
-                padding: 0 30px;
-            }
-            .hero {
-                padding: 80px 30px 40px 30px;
-            }
-            .hero h1 {
-                font-size: 40px;
-            }
+            nav .container { padding: 0 30px; }
+            .hero { padding: 80px 30px 40px 30px; }
+            .hero h1 { font-size: 40px; }
             .gallery {
                 padding: 0 30px;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 20px;
             }
-            .gallery-item .caption h2 {
-                font-size: 20px;
-            }
+            .gallery-item .caption h2 { font-size: 20px; }
         }
         /* ========================================
-           RESPONSIVE DESIGN - MOBILE
+           RESPONSIVE - MOBILE
         ======================================== */
         @media (max-width: 768px) {
-            nav {
-                padding: 20px 0;
-            }
-            nav .container {
-                padding: 0 20px;
-            }
+            nav { padding: 20px 0; }
+            nav .container { padding: 0 20px; }
             nav ul {
                 display: none;
                 flex-direction: column;
@@ -363,16 +357,12 @@
                 justify-content: flex-start;
                 align-items: flex-start;
             }
-            nav ul.active {
-                display: flex;
-            }
+            nav ul.active { display: flex; }
             nav ul li a {
                 font-size: 16px;
                 letter-spacing: 3px;
             }
-            .menu-toggle {
-                display: flex;
-            }
+            .menu-toggle { display: flex; }
             .hero {
                 margin-top: 90px;
                 padding: 40px 20px;
@@ -391,49 +381,48 @@
                 gap: 30px;
                 margin: 20px auto 60px auto;
             }
-            .gallery-item {
-                aspect-ratio: 4/5;
-            }
-            footer {
-                padding: 60px 20px;
-            }
+            .gallery-item { aspect-ratio: 4/5; }
+            footer { padding: 60px 20px; }
         }
     </style>
 </head>
 <body>
     <!-- ========================================
-         NAVIGATION BAR (Optimized Clean Architecture)
+         NAVIGATION BAR (FIXED LINKS)
     ======================================== -->
     <nav>
         <div class="container">
-            <a href="index.html" class="logo brand-title">Martin Cueva</a>
+            index.html
             <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Navigation Menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
             <ul id="menu">
-                <li><a href="index.html">Home</a></li>
+                <li>index.html</li>
                 <li>art.html</li>
-                <li>html">Photography</a></li>
+                <li><a hrefaphy.html</li>
                 <li>escritos.html</li>
-                <li>commissions.htmlCommissions & Contact</a></li>
+                <li>commissions.htmlCommissions &amp; Contact</a></li>
             </ul>
         </div>
     </nav>
+
     <!-- ========================================
-         HERO SECTION (High-Intent Positioning Statement)
+         HERO SECTION
     ======================================== -->
     <section class="hero">
         <h1>Martin Cueva</h1>
-        <p class="subtitle">Original Fine Art, Limited Edition Photography Prints, & Editorial Columns for Spanish-Language Media</p>
+        <p class="subtitle">Original Fine Art, Limited Edition Photography Prints, &amp; Editorial Columns for Spanish-Language Media</p>
     </section>
+
     <!-- ========================================
          COMMERCIAL CONVERSION GATEWAYS
     ======================================== -->
     <section class="gallery" id="gallery">
         <!-- Structured Gateways injected via configuration array below -->
     </section>
+
     <!-- ========================================
          FOOTER
     ======================================== -->
@@ -441,12 +430,12 @@
         <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.</p>
         <p class="copyright">© Martin Cueva — All Rights Reserved</p>
     </footer>
+
     <!-- ========================================
          JAVASCRIPT
     ======================================== -->
     <script>
         const CONFIG = {
-            // Consolidated high-intent commercial routes
             commercialGateways: [
                 {
                     image: 'PaintingCover.jpg',
@@ -471,9 +460,7 @@
                 }
             ]
         };
-        /**
-         * Dynamically inject the commercial gateway pillars
-         */
+
         function loadGateways() {
             const gallery = document.getElementById('gallery');
             if (!gallery) return;
@@ -483,21 +470,26 @@
                 itemLink.className = 'gallery-item';
                 itemLink.href = gateway.link;
                 itemLink.setAttribute('aria-label', `Navigate to ${gateway.title}`);
+
                 const img = document.createElement('img');
                 img.src = gateway.image;
                 img.alt = `${gateway.title} - ${gateway.subtitle}`;
                 img.loading = 'lazy';
                 img.decoding = 'async';
+
                 const caption = document.createElement('div');
                 caption.className = 'caption';
+
                 const titleElement = document.createElement('h2');
                 titleElement.textContent = gateway.title;
+
                 const subtitleElement = document.createElement('p');
                 subtitleElement.textContent = gateway.subtitle;
+
                 const actionElement = document.createElement('span');
                 actionElement.className = 'action-text';
                 actionElement.textContent = gateway.actionText;
-                // Assembly
+
                 caption.appendChild(titleElement);
                 caption.appendChild(subtitleElement);
                 caption.appendChild(actionElement);
@@ -506,19 +498,14 @@
                 gallery.appendChild(itemLink);
             });
         }
-        /**
-         * Toggle mobile menu view
-         */
+
         function toggleMenu() {
             const menu = document.getElementById('menu');
             if (menu) menu.classList.toggle('active');
         }
-        /**
-         * Initialize interface settings upon DOM completion
-         */
+
         window.addEventListener('DOMContentLoaded', () => {
             loadGateways();
-            // Clean active mobile state when links are selected
             document.querySelectorAll('#menu a').forEach(link => {
                 link.addEventListener('click', () => {
                     const menu = document.getElementById('menu');
