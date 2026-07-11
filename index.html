@@ -165,8 +165,12 @@
             background-color: #ffffff;
             transition: width 0.3s ease;
         }
+        nav ul li a.active::after,
         nav ul li a:hover::after {
             width: 100%;
+        }
+        nav ul li a.active {
+            color: #cccccc;
         }
         nav ul li a:hover {
             color: #cccccc;
@@ -392,18 +396,20 @@
     ======================================== -->
     <nav>
         <div class="container">
-            index.html
+            <a href="index.html" class="logo brand-title">Martin Cueva</a>
+
             <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Navigation Menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
+
             <ul id="menu">
-                <li>index.html</li>
-                <li>art.html</li>
-                <li><a hrefaphy.html</li>
-                <li>escritos.html</li>
-                <li>commissions.htmlCommissions &amp; Contact</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="art.html">Fine Art</a></li>
+                <li><a href="photography.html">Photography</a></li>
+                <li><a href="escritos.html">Escritos (Español)</a></li>
+                <li><a href="commissions.html" class="cta-nav">Commissions &amp; Contact</a></li>
             </ul>
         </div>
     </nav>
