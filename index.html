@@ -327,6 +327,22 @@
             text-transform: uppercase;
             font-weight: 400;
         }
+        footer .copyright-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        footer .social-icon img {
+            width: 16px;
+            height: 16px;
+            display: block;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        footer .social-icon:hover img {
+            opacity: 1;
+        }
         /* ========================================
            RESPONSIVE - TABLET
         ======================================== */
@@ -434,7 +450,11 @@
     ======================================== -->
     <footer>
         <p class="footer-bio">Martin Cueva is a visual artist and writer specializing in fine art commissions, curated landscape and portrait photography, and cultural commentary for print journalism.</p>
-        <p class="copyright">© Martin Cueva — All Rights Reserved</p>
+        <div class="copyright-row">
+            <p class="copyright">© Martin Cueva — All Rights Reserved</p>
+            <a href="https://www.linkedin.com/company/martincueva-art" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn"><img src="icon.png" alt="LinkedIn" /></a>
+            <a href="https://www.instagram.com/martincuevaart/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram"><img src="icon1.png" alt="Instagram" /></a>
+        </div>
     </footer>
 
     <!-- ========================================
